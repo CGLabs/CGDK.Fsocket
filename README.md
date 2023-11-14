@@ -6,11 +6,11 @@ network classes for Fsocket with CGDK::buffer<br>
 <br>
 
 ### 특징<br>
-   CGDK10.Fsocket은 자체적인 소켓을 구현하지 않았으며 unreal 3d에서 제공하는 Fsocket을 사용하여 구현하였습니다.<br>
-   CGDK10.Fsocket은 CGDK10과 동일한 방식으로 코딩이 가능하도록 하기 위해 랩핑(Wrapping)한 라이브러리로 되어 헤더 파일만으로 제작되어 include만으로 가볍게 사용가능합니다.<br>
-   CGDK10와는 모듈상의 의존 관계가 없이 독립적으로 사용 가능하며 플랫폼에도 구해받지 않고 사용 가능합니다.<br>
-   또한 가볍게 제공하기 위해 CGDK10 중 기본적인 소켓 기능을 Fsocket을 사용해 구현했습니다.<br>
-   직렬화는 CGDK.buffer로 수행합니다.<br>
+   CGDK10.Fsocket은 unreal 3d에서 제공하는 Fsocket을 사용하여<br>
+   CGDK10과 동일한 방식으로 코딩이 가능하도록 랩핑(Wrapping)한 클래스들입니다.<br>
+   헤더 파일로만 제작되어 library의 링크 없이 헤더 파일을 include만으로 가볍게 사용가능 합니다.<br>
+   이로 인해 플랫폼 종속성이 없어 unreal 3d가 동작하는 모든 플랫폼에서 사용 가능합니다.<br>
+   메시지 송수신용 버퍼는 CGDK.buffer로 수행해 CGDK10으로 제작된 서버들과 손쉽게 송수신이 가능합니다.<br>
 
 ## 사용법<br>
    CGDK10.Fsocket을 사용하는 방법은 대충 아래와 같습니다.<br>
