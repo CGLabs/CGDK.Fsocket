@@ -45,8 +45,7 @@ network classes for unreal 3D Fsocket with CGDK::buffer<br>
 ### 주의사항<br>
     1) socket 관련 i/o를 처리하기 위해 unreal 3d의 WorldSubSystem(UTickableWorldSubsystem 를 사용하고 있습니다.
        World Tick이 호출될 때 World Tick과 동기화 되어 호출이 되므로 별도의 쓰레드는 사용하고 있지 않습니다.
-       따라서 쓰레드 안전 처리는 특별히 필요하지 않습니다.
-       이에 따라 네크워크 지연 시간은 World Tick에 달려 있습니다.
+       따라서 쓰레드 안전 처리는 특별히 필요하지 않으며 World Tick은 네크워크 지연 시간에 큰 영향을 미칩니다.
 
     2) CGDK.buffer (https://github.com/CGLabs/CGDK.buffer/blob/master/LICENSE)을 포함하고 있습니다.
 
