@@ -46,7 +46,7 @@ network classes for unreal 3D Fsocket with CGDK::buffer<br>
 
 __1.__ 사용법은 CGDK10과 유사한 인터페이스를 가지고 있습니다. (하지만 CGDK10이 공개되어 있지 않으니...)
 unreal 3d 프로젝트를 올리기 힘든 관계롸 자세한 예제를 올리기 힘든 면이 있습니다.<br>
-더 자세한 설명이 필요하지만 discussions란에 글을 남기시거나 e-mail로 질문 주시면 최대한 빠르게 답변 드리겠습니다.<br>
+자세한 설명이 필요하시면 discussions란에 글을 남기시거나 e-mail로 질문 주시면 최대한 빠르게 답변 드리겠습니다.<br>
 <br>
 __2.__ socket 관련 i/o를 처리하기 위해 unreal 3d의 WorldSubSystem(UTickableWorldSubsystem)을 사용하고 있습니다.<br>
    World Tick과 동기화 되어 호출이 되므로 별도의 쓰레드는 사용하고 있지 않습니다.<br>
