@@ -1,5 +1,5 @@
 # CGDK.Fsocket<br>
-network classes for Fsocket with CGDK::buffer<br>
+network classes for unreal 3D Fsocket with CGDK::buffer<br>
 
 ### CGCK10.Fsocket란?<br>
    CGDK10에서 제공하는 unreal 3d용 client socket 모듈입니다.<br>
