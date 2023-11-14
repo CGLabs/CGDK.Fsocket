@@ -23,7 +23,7 @@ network classes for unreal 3D Fsocket with CGDK::buffer<br>
    ```
 <br>
 
-   __3.__ Fsocket을 사용하므로 Sockets당 모듈이 link되도록 설정해 주어야 합니다.<br>
+   __3.__ Fsocket을 사용하므로 Sockets 모듈이 link되도록 설정해 주어야 합니다.<br>
       따라서 PublicDependencyModuleNames에 "Sockets" 를 추가해 주십시요.<br>
    ``` C#
       PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", ... , "Sockets" });
