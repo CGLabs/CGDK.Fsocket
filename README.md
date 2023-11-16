@@ -48,9 +48,9 @@ __1.__ 사용법은 CGDK10과 유사한 인터페이스를 가지고 있습니�
 unreal 3d 프로젝트를 올리기 힘든 관계롸 자세한 예제를 올리기 힘든 면이 있습니다.<br>
 자세한 설명이 필요하시면 discussions란에 글을 남기시거나 e-mail로 질문 주시면 최대한 빠르게 답변 드리겠습니다.<br>
 <br>
-__2.__ socket 관련 i/o를 처리하기 위해 unreal 3d의 WorldSubSystem(UTickableWorldSubsystem)을 사용하고 있습니다.<br>
-   따라서 UWorld가 필요하며 Tick과 동기화 되어 호출이 되므로 별도의 쓰레드는 사용하고 있지 않습니다.<br>
-   따라서 쓰레드 안전 처리는 특별히 필요하지 않으며 World Tick은 네크워크 지연 시간에 큰 영향을 미칩니다.<br>
+__2.__ socket 관련 i/o를 처리하기 위해 unreal 3d의 WorldSubSystem(UTickableWorldSubsystem)을 사용하기 때문에<br>
+   UWorld가 필요하며 UWorld의 Tick과 동기화 되어 호출이 되므로 별도의 쓰레드는 사용하고 있지 않습니다.<br>
+   쓰레드 안전 처리는 특별히 필요하지 않으며 World Tick은 네크워크 지연 시간에 큰 영향을 미칩니다.<br>
 <br>
 __3.__ CGDK.buffer (https://github.com/CGLabs/CGDK.buffer/blob/master/LICENSE)을 포함하고 있습니다.<br>
 <br>
