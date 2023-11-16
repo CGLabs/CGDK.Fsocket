@@ -13,52 +13,42 @@
 //*****************************************************************************
 
 #pragma once
+
+namespace CGDK
+{
 //-----------------------------------------------------------------------------
-//
-// CGD::_buffer_view<T>
-//
+// CGDK::buffer_base
 //-----------------------------------------------------------------------------
-#ifndef _CGDK_BUFFER
-#define	_CGDK_BUFFER
+template <class ELEMENT_T = char>
+class  buffer_base
+{
+// traits) 
+protected:
+			using traits	 = _buffer_traits_t<ELEMENT_T>;
+			using element_t	 = ELEMENT_T;
+			using size_type	 = size_t;
+
+// variable)
+public:
+			size_type		size_ = 0;
+			element_t*		data_ = nullptr;
+};
+
 
 //-----------------------------------------------------------------------------
-// Pragma...
+// standard names (for C++ standard)
 //-----------------------------------------------------------------------------
-#if defined(_MSC_VER)
-	// warning C4344: behavior change: use of explicit template arguments results in call to ...
-	//    - Causes in front function
-	#pragma warning(disable:4344)
-#else
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wvarargs"
-#endif
+// 1) const_buffer
+using const_buffer = buffer_base<const char>;
+
+// 2) mutable_buffer
+using mutable_buffer = buffer_base<char>;
+
 
 //-----------------------------------------------------------------------------
-// Main
+// class defintions
 //-----------------------------------------------------------------------------
-// 1) shared_buffer traits
-#include "../buffers/_buffer_traits.h"
+// 1) memory
+class Imemory;
 
-// 2) shared_buffer
-#include "../buffers/_buffer_common.h"
-
-// 3) shared_buffer base
-#include "../buffers/_buffer_base.h"
-
-// 4) _buffer_view<T>
-#include "../buffers/_buffer_view.h"
-
-// 5) basic_buffer
-#include "../buffers/_Imemory.h"
-#include "../buffers/_basic_buffer.h"
-
-//-----------------------------------------------------------------------------
-// Pragma...
-//-----------------------------------------------------------------------------
-#if defined(_MSC_VER)
-	#pragma warning(default:4344)
-#else
-	#pragma GCC diagnostic pop
-#endif
-
-#endif
+}

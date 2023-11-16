@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{0c7e5eec-a7cc-48ca-af73-0509834eadea}</ItemsProjectGuid>
+    <ItemsProjectName>CGDK10.Fsocket</ItemsProjectName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)buffer" />
+    <None Include="$(MSBuildThisFileDirectory)buffers\_basic_buffer.inl" />
+    <None Include="$(MSBuildThisFileDirectory)buffers\_buffer_view.inl" />
+    <None Include="$(MSBuildThisFileDirectory)sdk10\containers\circular_list" />
+    <None Include="$(MSBuildThisFileDirectory)sdk10\system\object\basic_buffer.inl" />
+    <None Include="$(MSBuildThisFileDirectory)shared_buffer" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_basic_buffer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_buffer_base.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_buffer_common.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_buffer_traits.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_buffer_unreal.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_buffer_view.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_Imemory.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_make_shared_buffer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_shared_buffer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\common\definition.timer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\common\definitions.assert.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\common\definitions.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\common\definitions.message.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\common\lockable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\common\message_map.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\common\scoped_lock.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\containers\_allocator.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\containers\_allocator_pool.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\containers\_circular_list.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\containers\_definitions.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\executor.socket.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\executor.tickable_world_subsystem.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.definitions.socket.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.definitions.socket.protocol.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Iaddress.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Iclosable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Iconnectable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Ipacketable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Isendable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Isender.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Isend_completor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Isend_request.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Isocket.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.messageable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.packetable.datagram.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.packetable.stream.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.sender.datagram.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.sender.stream.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.sender.stream_header.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.send_request.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.ip.address.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.ip.address_v4.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.ip.address_v6.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.ip.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.ip.network.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.ip.network_v4.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.ip.network_v6.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.message.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.Nsocket_tcp.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.Nsocket_tcp_client.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.Nsocket_udp.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.sockaddr.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.socket.tcp.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.socket.tcp_client.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.socket.udp.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.statistics.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\tickable_executor.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\basic_buffer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\chrono.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\chrono_tick.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\chrono_time.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\chrono_time_client.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\definitions.buffer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\definitions.object.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\definitions.result_code.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\Idestroyable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\Idisposable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\Imemory.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\Imessageable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\Ireferenceable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\make_object.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\make_object_raw.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\make_own.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\make_shared_buffer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\obj.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\object_ptr.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\object_traits.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\own_ptr.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\referenceable.Nno_act.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\shared_buffer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\throwable.h" />
+  </ItemGroup>
+</Project>
