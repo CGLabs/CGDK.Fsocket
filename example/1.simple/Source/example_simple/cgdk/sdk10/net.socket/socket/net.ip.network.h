@@ -1,26 +1,29 @@
-﻿//*****************************************************************************
+//*****************************************************************************
 //*                                                                           *
-//*                               CGDK::buffer                                *
-//*                       ver 3.03 / release 2023.10.17                       *
+//*                      Cho sanghyun's Game Classes II                       *
+//*                       Ver 10.0 / Release 2019.12.11                       *
+//*                                                                           *
+//*                          network socket classes                           *
 //*                                                                           *
 //*                                                                           *
 //*                                                                           *
 //*                                                                           *
-//*  programmed by Cho SangHyun. sangduck@cgcii.com                           *
+//*  This Program is programmed by Cho SangHyun. sangduck@cgcii.co.kr         *
+//*  Best for Game Developement and Optimized for Game Developement.          *
 //*                                                                           *
+//*                (c) 2003. Cho Sanghyun. All right reserved.                *
 //*                          http://www.CGCII.co.kr                           *
 //*                                                                           *
 //*****************************************************************************
 
 #pragma once
-//-----------------------------------------------------------------------------
-//
-// CGD::_shared_buffer<T>
-//
-//-----------------------------------------------------------------------------
-// 1) buffer
-#include "../buffer"
 
-// 2) shared_buffer
-#include "../buffers/_shared_buffer.h"
-#include "../buffers/_make_shared_buffer.h"
+namespace CGDK
+{
+namespace net
+{
+namespace ip
+{
+}
+}
+}

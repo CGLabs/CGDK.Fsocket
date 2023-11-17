@@ -1,0 +1,293 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="cgdk">
+      <UniqueIdentifier>{dc231a10-0566-4db5-a725-0989c199fc20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="cgdk\buffers">
+      <UniqueIdentifier>{583a7e63-a671-487f-bb23-3e4791bd23ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk10">
+      <UniqueIdentifier>{b36bb83a-dbca-4f3f-b55c-686ce25cc140}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk10\common">
+      <UniqueIdentifier>{e4bdc56b-3529-4ece-a883-50b5ee3df0fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk10\containers">
+      <UniqueIdentifier>{15b6e493-476e-4cc1-8899-92dffa27a84b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk10\net.socket">
+      <UniqueIdentifier>{e0ccb131-ee67-4352-b936-970ec89f0d20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk10\system">
+      <UniqueIdentifier>{9d0f8716-fd01-41e6-a9a3-2da06d868efe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk10\net.socket\socket">
+      <UniqueIdentifier>{d8543296-3dcb-4ae6-a8a1-2d9bfd2019e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk10\system\object">
+      <UniqueIdentifier>{c23ba138-5532-4579-8d54-0018d84ef997}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_basic_buffer.h">
+      <Filter>cgdk\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_buffer_base.h">
+      <Filter>cgdk\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_buffer_common.h">
+      <Filter>cgdk\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_buffer_traits.h">
+      <Filter>cgdk\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_buffer_unreal.h">
+      <Filter>cgdk\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_buffer_view.h">
+      <Filter>cgdk\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_Imemory.h">
+      <Filter>cgdk\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_make_shared_buffer.h">
+      <Filter>cgdk\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)buffers\_shared_buffer.h">
+      <Filter>cgdk\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\common\definition.timer.h">
+      <Filter>sdk10\common</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\common\definitions.assert.h">
+      <Filter>sdk10\common</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\common\definitions.h">
+      <Filter>sdk10\common</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\common\definitions.message.h">
+      <Filter>sdk10\common</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\common\lockable.h">
+      <Filter>sdk10\common</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\common\message_map.h">
+      <Filter>sdk10\common</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\common\scoped_lock.h">
+      <Filter>sdk10\common</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\containers\_allocator.h">
+      <Filter>sdk10\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\containers\_allocator_pool.h">
+      <Filter>sdk10\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\containers\_circular_list.h">
+      <Filter>sdk10\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\containers\_definitions.h">
+      <Filter>sdk10\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\executor.socket.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.definitions.socket.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.definitions.socket.protocol.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Iaddress.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Iclosable.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Iconnectable.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Ipacketable.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Isend_completor.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Isend_request.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Isendable.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Isender.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.Isocket.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.messageable.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.packetable.datagram.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.packetable.stream.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.send_request.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.sender.datagram.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.sender.stream.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.io.sender.stream_header.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.ip.address.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.ip.address_v4.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.ip.address_v6.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.ip.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.ip.network.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.ip.network_v4.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.ip.network_v6.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.message.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.Nsocket_tcp.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.Nsocket_tcp_client.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.Nsocket_udp.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.sockaddr.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.socket.tcp.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.socket.tcp_client.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.socket.udp.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\net.statistics.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\tickable_executor.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\basic_buffer.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\chrono.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\chrono_tick.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\chrono_time.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\chrono_time_client.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\definitions.buffer.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\definitions.object.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\definitions.result_code.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\Idestroyable.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\Idisposable.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\Imemory.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\Imessageable.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\Ireferenceable.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\make_object.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\make_object_raw.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\make_own.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\make_shared_buffer.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\obj.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\object_ptr.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\object_traits.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\own_ptr.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\referenceable.Nno_act.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\shared_buffer.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\system\object\throwable.h">
+      <Filter>sdk10\system\object</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)sdk10\net.socket\socket\executor.tickable_world_subsystem.h">
+      <Filter>sdk10\net.socket\socket</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)buffers\_basic_buffer.inl">
+      <Filter>cgdk\buffers</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)buffers\_buffer_view.inl">
+      <Filter>cgdk\buffers</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)sdk10\containers\circular_list">
+      <Filter>sdk10\containers</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)sdk10\system\object\basic_buffer.inl">
+      <Filter>sdk10\system\object</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)buffer" />
+    <None Include="$(MSBuildThisFileDirectory)shared_buffer" />
+  </ItemGroup>
+</Project>

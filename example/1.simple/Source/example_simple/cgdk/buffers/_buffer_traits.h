@@ -13,52 +13,44 @@
 //*****************************************************************************
 
 #pragma once
+
+namespace CGDK
+{
 //-----------------------------------------------------------------------------
-//
-// CGD::_buffer_view<T>
-//
+// CGDK::buffer_traits
 //-----------------------------------------------------------------------------
-#ifndef _CGDK_BUFFER
-#define	_CGDK_BUFFER
+class  _buffer_traits_const {};
+class  _buffer_traits_mutable {};
+
 
 //-----------------------------------------------------------------------------
-// Pragma...
+// CGDK::buffer_traits
 //-----------------------------------------------------------------------------
-#if defined(_MSC_VER)
-	// warning C4344: behavior change: use of explicit template arguments results in call to ...
-	//    - Causes in front function
-	#pragma warning(disable:4344)
-#else
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wvarargs"
-#endif
+template <class T, class F=void>	class _buffer_traits {};
+template <class T>					class _buffer_traits <T, std::enable_if_t<std::is_const_v<T>>>	{ public: using type = _buffer_traits_const; };
+template <class T>					class _buffer_traits <T, std::enable_if_t<!std::is_const_v<T>>>	{ public: using type = _buffer_traits_mutable; };
+
+template <class T> using _buffer_traits_t = typename _buffer_traits<T>::type;
+
 
 //-----------------------------------------------------------------------------
-// Main
+// CGDK::const...
 //-----------------------------------------------------------------------------
-// 1) shared_buffer traits
-#include "../buffers/_buffer_traits.h"
+template <class T, class F=void>	class _element_void {};
+template <class T>					class _element_void <T, std::enable_if_t<std::is_const_v<T>>> { public: using type = const void; };
+template <class T>					class _element_void <T, std::enable_if_t<!std::is_const_v<T>>> { public: using type = void; };
 
-// 2) shared_buffer
-#include "../buffers/_buffer_common.h"
+template <class T> using _element_void_t = typename _element_void<T>::type;
 
-// 3) shared_buffer base
-#include "../buffers/_buffer_base.h"
-
-// 4) _buffer_view<T>
-#include "../buffers/_buffer_view.h"
-
-// 5) basic_buffer
-#include "../buffers/_Imemory.h"
-#include "../buffers/_basic_buffer.h"
 
 //-----------------------------------------------------------------------------
-// Pragma...
+// CGDK::buffer_traits
 //-----------------------------------------------------------------------------
-#if defined(_MSC_VER)
-	#pragma warning(default:4344)
-#else
-	#pragma GCC diagnostic pop
-#endif
+template <class TRAITS_T, class T>	class _buffer_return {};
+template <class T>					class _buffer_return< _buffer_traits_const, T> { public: using type = const T; };
+template <class T>					class _buffer_return< _buffer_traits_mutable, T> { public: using type = T; };
+																								
+template <class TRAITS_T, class T> using _buffer_return_t = typename _buffer_return<TRAITS_T, T>::type;
 
-#endif
+
+}
