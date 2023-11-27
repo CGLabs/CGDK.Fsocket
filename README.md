@@ -19,7 +19,7 @@ network classes for unreal 3D Fsocket with CGDK::buffer<br>
    __2.__ "cgdk/sdk10/net.socket.h"만 include 해주시면 됩니다.<br>
 
    ``` C++
-      #include "cgdk/sdk10/net.socket.h"<br>
+      #include "cgdk/sdk10/net.socket.h"
    ```
 <br>
 
@@ -44,7 +44,7 @@ network classes for unreal 3D Fsocket with CGDK::buffer<br>
 
 ### 주의사항
 
-__1.__ 사용법은 CGDK10과 유사한 인터페이스를 가지고 있습니다. (하지만 CGDK10이 공개되어 있지 않으니...)
+__1.__ 사용법은 CGDK10과 유사한 인터페이스를 가지고 있습니다.
 unreal 3d 프로젝트를 올리기 힘든 관계롸 자세한 예제를 올리기 힘든 면이 있습니다.<br>
 자세한 설명이 필요하시면 discussions란에 글을 남기시거나 e-mail로 질문 주시면 최대한 빠르게 답변 드리겠습니다.<br>
 <br>
