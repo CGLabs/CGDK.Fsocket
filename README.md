@@ -52,7 +52,7 @@ __2.__ socket 관련 i/o를 처리하기 위해 unreal 3d의 WorldSubSystem(UTic
    UWorld의 Tick과 동기화 되어 호출이 되므로 별도의 쓰레드는 사용하고 있지 않습니다.<br>
    쓰레드 안전 처리는 특별히 필요하지 않으며 World Tick은 네크워크 지연 시간에 큰 영향을 미칩니다.<br>
 <br>
-__3.__ CGDK.buffer (https://github.com/CGLabs/CGDK.buffer/blob/master/LICENSE)을 포함하고 있습니다.<br>
+__3.__ CGDK.buffer (https://github.com/CGLabs/CGDK.buffer)을 포함하고 있습니다.<br>
 <br>
 
 ### 라이센스(License)<br>
