@@ -10,7 +10,7 @@ network classes for unreal 3D Fsocket with CGDK::buffer<br>
    CGDK10으로 제작된 서버와 손쉬운 통신과 CGDK10과 동일한 방식으로 코딩이 가능하도록 하기 위해 랩핑(Wrapping)한 클래스들입니다.<br>
    헤더 파일로만 제작되어 library의 링크 없이 헤더 파일을 include만으로 가볍게 사용가능 합니다.<br>
    이로 인해 플랫폼 종속성이 없어 unreal 3d가 동작하는 모든 플랫폼에서 사용 가능합니다.<br>
-   메시지 송수신용 버퍼로 CGDK.buffer를 사용하고 있어 CGGDK::buffer를 포함하고 있습니다.
+   메시지 송수신용 버퍼로 CGDK::buffer를 사용하고 있어 CGGDK::buffer 모듈을 포함하고 있습니다.
 
 ## 사용법<br>
    CGDK10.Fsocket을 사용하는 방법은 대충 아래와 같습니다.<br>
