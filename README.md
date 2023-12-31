@@ -15,7 +15,7 @@ network classes for unreal 3D Fsocket with CGDK::buffer<br>
 ## 사용법<br>
    CGDK10.Fsocket을 사용하는 방법은 대충 아래와 같습니다.<br>
 <br>
-   __1.__ "/cgdk" 폴더 전체를 unreal 3d 프로젝트 폴더의 "/Source/[프로젝트명]" 폴더 밑에 통체로 복사해 넣습니다.<br>
+   __1.__ "/cgdk" 폴더 전체를 unreal 3d 프로젝트 폴더의 "/Source/[프로젝트명]" 폴더 밑에 통로 복사해 넣습니다.<br>
    __2.__ "cgdk/sdk10/net.socket.h"만 include 해주시면 됩니다.<br>
 
    ``` C++
