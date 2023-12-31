@@ -24,7 +24,7 @@ network classes for unreal 3D Fsocket with CGDK::buffer<br>
 <br>
 
    __3.__ Fsocket을 사용하므로 Sockets 모듈이 link되도록 설정해 주어야 합니다.<br>
-      따라서 PublicDependencyModuleNames에 "Sockets" 를 추가해 주십시요.<br>
+      PublicDependencyModuleNames에 "Sockets" 를 추가해 주십시요.<br>
    ``` C#
       PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", ... , "Sockets" });
    ```
@@ -32,7 +32,7 @@ network classes for unreal 3D Fsocket with CGDK::buffer<br>
 
    __4.__ exception 컴파일 옵션을 설정해 줍니다.<br>
       CGDK는 exception을 사용하므로 이에 따른 옵션은 설정해 주어야 합니다.<br>
-      따라서 프로젝트명.build.cs 파일을 열어 아래와 같은 옵션을 추가해 주십시요.<br>
+      프로젝트명.build.cs 파일을 열어 아래와 같은 옵션을 추가해 주십시요.<br>
    ``` C#
       bEnableExceptions = true;
    ```
