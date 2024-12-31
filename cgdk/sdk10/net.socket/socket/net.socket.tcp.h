@@ -27,11 +27,9 @@ namespace CGDK
 // ----------------------------------------------------------------------------
 template <class RECEIVE_HEADER_T = uint32_t, class SEND_HEADER_T = RECEIVE_HEADER_T>
 class net::socket::tcp :
-// Inherited classes) 
 	public						net::io::Nsocket_tcp,
 	public						net::io::sender::tcp::Ndefault<SEND_HEADER_T>,
 	public						net::io::packetable::tcp::Ndefault<RECEIVE_HEADER_T>,
-	public						net::io::send_request::tcp::Ndefault,
 	public						net::io::messageable::tcp::Ndefault
 {
 };

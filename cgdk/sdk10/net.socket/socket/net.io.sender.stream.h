@@ -26,16 +26,14 @@ namespace CGDK
 //
 //-----------------------------------------------------------------------------
 class net::io::sender::Nstream : 
-// Inherited classes)
-	virtual public				net::io::Isend_request,
 	virtual public				net::io::Isender,
-	virtual public				net::io::statistics::Nsocket
+	virtual public				net::io::Isocket_tcp
 {
 public:
-	virtual	bool				process_send( const shared_buffer& _buffer, uint64_t _option) override;
+	virtual	bool				process_send( shared_buffer&& _buffer, uint64_t _option) override;
 };
 
-inline bool net::io::sender::Nstream::process_send( const shared_buffer& _buffer, uint64_t /*_option*/)
+inline bool net::io::sender::Nstream::process_send( shared_buffer&& _buffer, uint64_t /*_option*/)
 {
 	// check) _buffer->data_가 nullptr이 아닌가?
 	ERROR_RETURN_IF(_buffer.data() == nullptr, false, )
@@ -46,12 +44,9 @@ inline bool net::io::sender::Nstream::process_send( const shared_buffer& _buffer
 	// check) 버퍼가 Overflow되었는가?
 	check(_buffer._is_buffer_overflow() == false);
 
-	// declare)
-	FInternetAddr* address_peer = nullptr;
-
 	// 1) 전송한다.
-	return request_send(nullptr, &_buffer, 1, _buffer.get_source(), 1, *address_peer);
-}
+	return this->process_sendable(std::move(_buffer), 1);
 
+}
 
 }

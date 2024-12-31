@@ -25,9 +25,7 @@ namespace CGDK
 // Imessageable
 //                                                                            
 //-----------------------------------------------------------------------------
-class Imessageable : 
-// Inherited Classes) 
-	virtual public				Ireferenceable
+class Imessageable
 {
 // constructor/destructor)
 public:
@@ -38,14 +36,19 @@ public:
 // public)
 public:
 	//! @brief 메시지 처리를 요청한다. @param _msg 처리 요청하는 메시지 @return true !0 처리됨 @return 0 처리하지 않음
-	virtual	result_code			request_process_message(sMESSAGE& _msg)	{ if(is_messageable_disabled()) return eRESULT::FAIL_DISABLED; return process_message(_msg);}
-			result_code			request_process_message(sMESSAGE&& _msg){ return request_process_message(_msg); }
+			result_code			request_process_message(sMESSAGE& _msg)	
+			{
+				if(this->is_messageable_disabled())
+					return eRESULT::FAIL_DISABLED;
+
+				return this->process_message(_msg);
+			}
 																		  
 	// 2) enable Status													  
-			void				enable_messageable() noexcept			{ m_enable_messageable = true;}
-			void				disable_messageable() noexcept			{ m_enable_messageable = false;}
-			bool				is_messageable_enabled() const noexcept	{ return m_enable_messageable;}
-			bool				is_messageable_disabled() const noexcept{ return !is_messageable_enabled();}
+			void				enable_messageable() noexcept			{ this->m_enable_messageable = true;}
+			void				disable_messageable() noexcept			{ this->m_enable_messageable = false;}
+			bool				is_messageable_enabled() const noexcept	{ return this->m_enable_messageable;}
+			bool				is_messageable_disabled() const noexcept{ return !this->is_messageable_enabled();}
 
 // framework)
 protected:

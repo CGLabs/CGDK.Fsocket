@@ -1,7 +1,7 @@
 ﻿//*****************************************************************************
 //*                                                                           *
 //*                               CGDK::buffer                                *
-//*                       ver 3.03 / release 2023.10.17                       *
+//*                       ver 5.0 / release 2021.11.01                        *
 //*                                                                           *
 //*                                                                           *
 //*                                                                           *
@@ -21,13 +21,13 @@
 #include <stdexcept>
 #include <type_traits>
 
-// 2) stl
-#if !defined(_MSC_VER)
+// 2) memory
+#if defined(_MSC_VER)
+	#include <xmemory>
+#else
 	#include <memory.h>
 	#include <list>
 #endif
-#include <memory>
-#include <string>
 
 
 //-----------------------------------------------------------------------------
@@ -54,6 +54,11 @@
 	#define _CGD_BUFFER_BOUND_CHECK(condition)	if((condition) == false) { throw std::overflow_error("CGDK::shared_buffer out of memory bounding");}
 #else
 	#define _CGD_BUFFER_BOUND_CHECK(condition)	if((condition) == false) { CGDK_ASSERT_ON_BOUND; throw std::overflow_error("CGDK::shared_buffer out of memory bounding");}
+#endif
+
+
+#if defined(UE_BUILD_DEBUG) || defined(UE_BUILD_DEVELOPMENT) || defined(UE_BUILD_TEST) || defined(UE_BUILD_SHIPPING)
+	#define _CGD_UNREAL
 #endif
 
 
@@ -479,6 +484,10 @@ template <class T> constexpr bool is_static_string_v = is_static_string<T>::valu
 // 5) object_ptr<T>
 template<class T> struct is_object_ptr : public std::false_type {};
 template<class A> struct is_object_ptr<object_ptr<A>> : public std::true_type {};
+#if defined(_CGD_UNREAL)
+template<class A> struct is_object_ptr<TSharedPtr<A>> : public std::true_type {};
+template<class A> struct is_object_ptr<TSharedRef<A>> : public std::true_type {};
+#endif
 template <class T> constexpr bool is_object_ptr_v = is_object_ptr<T>::value;
 
 // 6) own_ptr<T>
@@ -521,6 +530,14 @@ template<class A, class B> struct is_linear_container<circular_list<A, B>> : pub
 template<class A, class B> struct is_linear_container<std::list<object_ptr<A>, B>> : public std::false_type {};
 template<class A, class B> struct is_linear_container<std::deque<object_ptr<A>, B>> : public std::false_type {};
 template<class A, class B> struct is_linear_container<circular_list<object_ptr<A>, B>> : public std::false_type {};
+#if defined(_CGD_UNREAL)
+template<class A, class B> struct is_linear_container<std::list<TSharedPtr<A>, B>> : public std::false_type {};
+template<class A, class B> struct is_linear_container<std::deque<TSharedPtr<A>, B>> : public std::false_type {};
+template<class A, class B> struct is_linear_container<circular_list<TSharedPtr<A>, B>> : public std::false_type {};
+template<class A, class B> struct is_linear_container<std::list<TSharedRef<A>, B>> : public std::false_type {};
+template<class A, class B> struct is_linear_container<std::deque<TSharedRef<A>, B>> : public std::false_type {};
+template<class A, class B> struct is_linear_container<circular_list<TSharedRef<A>, B>> : public std::false_type {};
+#endif
 template<class A, class B> struct is_linear_container<std::list<own_ptr<A>, B>> : public std::false_type {};
 template<class A, class B> struct is_linear_container<std::deque<own_ptr<A>, B>> : public std::false_type {};
 template<class A, class B> struct is_linear_container<circular_list<own_ptr<A>, B>> : public std::false_type {};
@@ -533,6 +550,14 @@ template<class A, class B> struct is_linear_object_ptr_container<circular_list<A
 template<class A, class B> struct is_linear_object_ptr_container<std::list<object_ptr<A>, B>> : public std::true_type {};
 template<class A, class B> struct is_linear_object_ptr_container<std::deque<object_ptr<A>, B>> : public std::true_type {};
 template<class A, class B> struct is_linear_object_ptr_container<circular_list<object_ptr<A>, B>> : public std::true_type {};
+#if defined(_CGD_UNREAL)
+template<class A, class B> struct is_linear_object_ptr_container<std::list<TSharedPtr<A>, B>> : public std::true_type {};
+template<class A, class B> struct is_linear_object_ptr_container<std::deque<TSharedPtr<A>, B>> : public std::true_type {};
+template<class A, class B> struct is_linear_object_ptr_container<circular_list<TSharedPtr<A>, B>> : public std::true_type {};
+template<class A, class B> struct is_linear_object_ptr_container<std::list<TSharedRef<A>, B>> : public std::true_type {};
+template<class A, class B> struct is_linear_object_ptr_container<std::deque<TSharedRef<A>, B>> : public std::true_type {};
+template<class A, class B> struct is_linear_object_ptr_container<circular_list<TSharedRef<A>, B>> : public std::true_type {};
+#endif
 template<class A, class B> struct is_linear_object_ptr_container<std::list<own_ptr<A>, B>> : public std::false_type {};
 template<class A, class B> struct is_linear_object_ptr_container<std::deque<own_ptr<A>, B>> : public std::false_type {};
 template<class A, class B> struct is_linear_object_ptr_container<circular_list<own_ptr<A>, B>> : public std::false_type {};
@@ -545,6 +570,14 @@ template<class A, class B>	struct is_linear_own_ptr_container<circular_list<A, B
 template<class A, class B>	struct is_linear_own_ptr_container<std::list<object_ptr<A>, B>> : public std::false_type {};
 template<class A, class B>	struct is_linear_own_ptr_container<std::deque<object_ptr<A>, B>> : public std::false_type {};
 template<class A, class B>	struct is_linear_own_ptr_container<circular_list<object_ptr<A>, B>> : public std::false_type {};
+#if defined(_CGD_UNREAL)
+template<class A, class B>	struct is_linear_own_ptr_container<std::list<TSharedPtr<A>, B>> : public std::false_type {};
+template<class A, class B>	struct is_linear_own_ptr_container<std::deque<TSharedPtr<A>, B>> : public std::false_type {};
+template<class A, class B>	struct is_linear_own_ptr_container<circular_list<TSharedPtr<A>, B>> : public std::false_type {};
+template<class A, class B>	struct is_linear_own_ptr_container<std::list<TSharedRef<A>, B>> : public std::false_type {};
+template<class A, class B>	struct is_linear_own_ptr_container<std::deque<TSharedRef<A>, B>> : public std::false_type {};
+template<class A, class B>	struct is_linear_own_ptr_container<circular_list<TSharedRef<A>, B>> : public std::false_type {};
+#endif
 template<class A, class B>	struct is_linear_own_ptr_container<std::list<own_ptr<A>, B>> : public std::true_type {};
 template<class A, class B>	struct is_linear_own_ptr_container<std::deque<own_ptr<A>, B>> : public std::true_type {};
 template<class A, class B>	struct is_linear_own_ptr_container<circular_list<own_ptr<A>, B>> : public std::true_type {};
@@ -570,6 +603,12 @@ template<class A, class B>			struct is_linear_container_with_reserve<std::vector
 template<class A, std::size_t B>	struct is_linear_container_with_reserve<static_vector<object_ptr<A>, B>> : public std::false_type {};
 template<class A, class B>			struct is_linear_container_with_reserve<std::vector<own_ptr<A>, B>> : public std::false_type {};
 template<class A, std::size_t B>	struct is_linear_container_with_reserve<static_vector<own_ptr<A>, B>> : public std::false_type {};
+#if defined(_CGD_UNREAL)
+template<class A, class B>			struct is_linear_container_with_reserve<std::vector<TSharedPtr<A>, B>> : public std::false_type {};
+template<class A, std::size_t B>	struct is_linear_container_with_reserve<static_vector<TSharedPtr<A>, B>> : public std::false_type {};
+template<class A, class B>			struct is_linear_container_with_reserve<std::vector<TSharedRef<A>, B>> : public std::false_type {};
+template<class A, std::size_t B>	struct is_linear_container_with_reserve<static_vector<TSharedRef<A>, B>> : public std::false_type {};
+#endif
 
 // linear container<object_ptr<T>>
 template<class T>					struct is_linear_object_ptr_container_with_reserve : public std::false_type {};
@@ -579,6 +618,13 @@ template<class A, class B>			struct is_linear_object_ptr_container_with_reserve<
 template<class A, std::size_t B>	struct is_linear_object_ptr_container_with_reserve<static_vector<object_ptr<A>, B>> : public std::true_type {};
 template<class A, class B>			struct is_linear_object_ptr_container_with_reserve<std::vector<own_ptr<A>, B>> : public std::false_type {};
 template<class A, std::size_t B>	struct is_linear_object_ptr_container_with_reserve<static_vector<own_ptr<A>, B>> : public std::false_type {};
+#if defined(_CGD_UNREAL)
+template<class A, class B>			struct is_linear_object_ptr_container_with_reserve<std::vector<TSharedPtr<A>, B>> : public std::true_type {};
+template<class A, std::size_t B>	struct is_linear_object_ptr_container_with_reserve<static_vector<TSharedPtr<A>, B>> : public std::true_type {};
+template<class A, class B>			struct is_linear_object_ptr_container_with_reserve<std::vector<TSharedRef<A>, B>> : public std::true_type {};
+template<class A, std::size_t B>	struct is_linear_object_ptr_container_with_reserve<static_vector<TSharedRef<A>, B>> : public std::true_type {};
+#endif
+
 
 // linear container<own_ptr<T>>
 template<class T>					struct is_linear_own_ptr_container_with_reserve : public std::false_type {};
@@ -588,6 +634,12 @@ template<class A, class B>			struct is_linear_own_ptr_container_with_reserve<std
 template<class A, std::size_t B>	struct is_linear_own_ptr_container_with_reserve<static_vector<object_ptr<A>, B>> : public std::false_type {};
 template<class A, class B>			struct is_linear_own_ptr_container_with_reserve<std::vector<own_ptr<A>, B>> : public std::true_type {};
 template<class A, std::size_t B>	struct is_linear_own_ptr_container_with_reserve<static_vector<own_ptr<A>, B>> : public std::true_type {};
+#if defined(_CGD_UNREAL)
+template<class A, class B>			struct is_linear_own_ptr_container_with_reserve<std::vector<TSharedPtr<A>, B>> : public std::false_type {};
+template<class A, std::size_t B>	struct is_linear_own_ptr_container_with_reserve<static_vector<TSharedPtr<A>, B>> : public std::false_type {};
+template<class A, class B>			struct is_linear_own_ptr_container_with_reserve<std::vector<TSharedRef<A>, B>> : public std::false_type {};
+template<class A, std::size_t B>	struct is_linear_own_ptr_container_with_reserve<static_vector<TSharedRef<A>, B>> : public std::false_type {};
+#endif
 
 // set container<T>)
 template<class T> struct is_set_container : public std::false_type {};
@@ -597,6 +649,12 @@ template<class A, class B, class C>	struct is_set_container<std::set<object_ptr<
 template<class A, class B, class C>	struct is_set_container<std::multiset<object_ptr<A>, B, C>> : public std::false_type {};
 template<class A, class B, class C>	struct is_set_container<std::set<own_ptr<A>, B, C>> : public std::false_type {};
 template<class A, class B, class C>	struct is_set_container<std::multiset<own_ptr<A>, B, C>> : public std::false_type {};
+#if defined(_CGD_UNREAL)
+template<class A, class B, class C>	struct is_set_container<std::set<TSharedPtr<A>, B, C>> : public std::false_type {};
+template<class A, class B, class C>	struct is_set_container<std::multiset<TSharedPtr<A>, B, C>> : public std::false_type {};
+template<class A, class B, class C>	struct is_set_container<std::set<TSharedRef<A>, B, C>> : public std::false_type {};
+template<class A, class B, class C>	struct is_set_container<std::multiset<TSharedRef<A>, B, C>> : public std::false_type {};
+#endif
 
 // std::set<object_ptr<T>>, std::multiset<object_ptr<T>>, ...
 template<class T> struct is_set_object_ptr_container : public std::false_type {};
@@ -606,6 +664,12 @@ template<class A, class B, class C>	struct is_set_object_ptr_container<std::set<
 template<class A, class B, class C>	struct is_set_object_ptr_container<std::multiset<object_ptr<A>, B, C>> : public std::true_type {};
 template<class A, class B, class C>	struct is_set_object_ptr_container<std::set<own_ptr<A>, B, C>> : public std::false_type {};
 template<class A, class B, class C>	struct is_set_object_ptr_container<std::multiset<own_ptr<A>, B, C>> : public std::false_type {};
+#if defined(_CGD_UNREAL)
+template<class A, class B, class C>	struct is_set_object_ptr_container<std::set<TSharedPtr<A>, B, C>> : public std::true_type {};
+template<class A, class B, class C>	struct is_set_object_ptr_container<std::multiset<TSharedPtr<A>, B, C>> : public std::true_type {};
+template<class A, class B, class C>	struct is_set_object_ptr_container<std::set<TSharedRef<A>, B, C>> : public std::true_type {};
+template<class A, class B, class C>	struct is_set_object_ptr_container<std::multiset<TSharedRef<A>, B, C>> : public std::true_type {};
+#endif
 
 // std::set<own_ptr<T>>, std::multiset<own_ptr<T>>, ...
 template<class T> struct is_set_own_ptr_container : public std::false_type {};
@@ -615,6 +679,12 @@ template<class A, class B, class C>	struct is_set_own_ptr_container<std::set<obj
 template<class A, class B, class C>	struct is_set_own_ptr_container<std::multiset<object_ptr<A>, B, C>> : public std::false_type {};
 template<class A, class B, class C>	struct is_set_own_ptr_container<std::set<own_ptr<A>, B, C>> : public std::true_type {};
 template<class A, class B, class C>	struct is_set_own_ptr_container<std::multiset<own_ptr<A>, B, C>> : public std::true_type {};
+#if defined(_CGD_UNREAL)
+template<class A, class B, class C>	struct is_set_own_ptr_container<std::set<TSharedPtr<A>, B, C>> : public std::false_type {};
+template<class A, class B, class C>	struct is_set_own_ptr_container<std::multiset<TSharedPtr<A>, B, C>> : public std::false_type {};
+template<class A, class B, class C>	struct is_set_own_ptr_container<std::set<TSharedRef<A>, B, C>> : public std::false_type {};
+template<class A, class B, class C>	struct is_set_own_ptr_container<std::multiset<TSharedRef<A>, B, C>> : public std::false_type {};
+#endif
 
 // associated container<T>)
 template<class T> struct is_associative_container : public std::false_type {};
@@ -636,6 +706,20 @@ template<class A, class B, class C, class D>			struct is_associative_container<s
 template<class A, class B, class C, class D>			struct is_associative_container<std::unordered_multiset<A, own_ptr<B>, C, D>> : public std::false_type {};
 template<class A, class B, class C, class D, class E>	struct is_associative_container<std::unordered_map<A, own_ptr<B>, C, D, E>> : public std::false_type {};
 template<class A, class B, class C, class D, class E>	struct is_associative_container<std::unordered_multimap<A, own_ptr<B>, C, D, E>> : public std::false_type {};
+#if defined(_CGD_UNREAL)
+template<class A, class B, class C, class D>			struct is_associative_container<std::map<A, TSharedPtr<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D>			struct is_associative_container<std::multimap<A, TSharedPtr<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D>			struct is_associative_container<std::unordered_set<A, TSharedPtr<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D>			struct is_associative_container<std::unordered_multiset<A, TSharedPtr<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D, class E>	struct is_associative_container<std::unordered_map<A, TSharedPtr<B>, C, D, E>> : public std::false_type {};
+template<class A, class B, class C, class D, class E>	struct is_associative_container<std::unordered_multimap<A, TSharedPtr<B>, C, D, E>> : public std::false_type {};
+template<class A, class B, class C, class D>			struct is_associative_container<std::map<A, TSharedRef<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D>			struct is_associative_container<std::multimap<A, TSharedRef<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D>			struct is_associative_container<std::unordered_set<A, TSharedRef<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D>			struct is_associative_container<std::unordered_multiset<A, TSharedRef<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D, class E>	struct is_associative_container<std::unordered_map<A, TSharedRef<B>, C, D, E>> : public std::false_type {};
+template<class A, class B, class C, class D, class E>	struct is_associative_container<std::unordered_multimap<A, TSharedRef<B>, C, D, E>> : public std::false_type {};
+#endif
 
 // associated container<object_ptr<T>>)
 template<class T> struct is_associative_object_ptr_container : public std::false_type {};
@@ -657,6 +741,20 @@ template<class A, class B, class C, class D>			struct is_associative_object_ptr_
 template<class A, class B, class C, class D>			struct is_associative_object_ptr_container<std::unordered_multiset<A, own_ptr<B>, C, D>> : public std::false_type {};
 template<class A, class B, class C, class D, class E>	struct is_associative_object_ptr_container<std::unordered_map<A, own_ptr<B>, C, D, E>> : public std::false_type {};
 template<class A, class B, class C, class D, class E>	struct is_associative_object_ptr_container<std::unordered_multimap<A, own_ptr<B>, C, D, E>> : public std::false_type {};
+#if defined(_CGD_UNREAL)
+template<class A, class B, class C, class D>			struct is_associative_object_ptr_container<std::map<A, TSharedPtr<B>, C, D>> : public std::true_type {};
+template<class A, class B, class C, class D>			struct is_associative_object_ptr_container<std::multimap<A, TSharedPtr<B>, C, D>> : public std::true_type {};
+template<class A, class B, class C, class D>			struct is_associative_object_ptr_container<std::unordered_set<A, TSharedPtr<B>, C, D>> : public std::true_type {};
+template<class A, class B, class C, class D>			struct is_associative_object_ptr_container<std::unordered_multiset<A, TSharedPtr<B>, C, D>> : public std::true_type {};
+template<class A, class B, class C, class D, class E>	struct is_associative_object_ptr_container<std::unordered_map<A, TSharedPtr<B>, C, D, E>> : public std::true_type {};
+template<class A, class B, class C, class D, class E>	struct is_associative_object_ptr_container<std::unordered_multimap<A, TSharedPtr<B>, C, D, E>> : public std::true_type {};
+template<class A, class B, class C, class D>			struct is_associative_object_ptr_container<std::map<A, TSharedRef<B>, C, D>> : public std::true_type {};
+template<class A, class B, class C, class D>			struct is_associative_object_ptr_container<std::multimap<A, TSharedRef<B>, C, D>> : public std::true_type {};
+template<class A, class B, class C, class D>			struct is_associative_object_ptr_container<std::unordered_set<A, TSharedRef<B>, C, D>> : public std::true_type {};
+template<class A, class B, class C, class D>			struct is_associative_object_ptr_container<std::unordered_multiset<A, TSharedRef<B>, C, D>> : public std::true_type {};
+template<class A, class B, class C, class D, class E>	struct is_associative_object_ptr_container<std::unordered_map<A, TSharedRef<B>, C, D, E>> : public std::true_type {};
+template<class A, class B, class C, class D, class E>	struct is_associative_object_ptr_container<std::unordered_multimap<A, TSharedRef<B>, C, D, E>> : public std::true_type {};
+#endif
 
 // associated container<own_ptr<T>>)
 template<class T> struct is_associative_own_ptr_container : public std::false_type {};
@@ -678,6 +776,20 @@ template<class A, class B, class C, class D>			struct is_associative_own_ptr_con
 template<class A, class B, class C, class D>			struct is_associative_own_ptr_container<std::unordered_multiset<A, own_ptr<B>, C, D>> : public std::true_type {};
 template<class A, class B, class C, class D, class E>	struct is_associative_own_ptr_container<std::unordered_map<A, own_ptr<B>, C, D, E>> : public std::true_type {};
 template<class A, class B, class C, class D, class E>	struct is_associative_own_ptr_container<std::unordered_multimap<A, own_ptr<B>, C, D, E>> : public std::true_type {};
+#if defined(_CGD_UNREAL)
+template<class A, class B, class C, class D>			struct is_associative_own_ptr_container<std::map<A, TSharedPtr<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D>			struct is_associative_own_ptr_container<std::multimap<A, TSharedPtr<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D>			struct is_associative_own_ptr_container<std::unordered_set<A, TSharedPtr<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D>			struct is_associative_own_ptr_container<std::unordered_multiset<A, TSharedPtr<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D, class E>	struct is_associative_own_ptr_container<std::unordered_map<A, TSharedPtr<B>, C, D, E>> : public std::false_type {};
+template<class A, class B, class C, class D, class E>	struct is_associative_own_ptr_container<std::unordered_multimap<A, TSharedPtr<B>, C, D, E>> : public std::false_type {};
+template<class A, class B, class C, class D>			struct is_associative_own_ptr_container<std::map<A, TSharedRef<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D>			struct is_associative_own_ptr_container<std::multimap<A, TSharedRef<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D>			struct is_associative_own_ptr_container<std::unordered_set<A, TSharedRef<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D>			struct is_associative_own_ptr_container<std::unordered_multiset<A, TSharedRef<B>, C, D>> : public std::false_type {};
+template<class A, class B, class C, class D, class E>	struct is_associative_own_ptr_container<std::unordered_map<A, TSharedRef<B>, C, D, E>> : public std::false_type {};
+template<class A, class B, class C, class D, class E>	struct is_associative_own_ptr_container<std::unordered_multimap<A, TSharedRef<B>, C, D, E>> : public std::false_type {};
+#endif
 
 
 template<class T> struct is_buffer_type : public std::false_type {};
@@ -1227,7 +1339,60 @@ template<class T>			class serializer_size_of<T*, std::enable_if_t<std::is_base_o
 
 
 #if defined(_CGDK)
-// 2) object_ptr<T>- Ibuffer_serializable
+#if defined(_CGD_UNREAL)
+// 2A) object_ptr<T>- Ibuffer_serializable
+template<class B, class T>	class serializer_append<B, TSharedPtr<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
+							{	using TX = std::remove_const_t<T>;
+								public:	using type = _buffer_view<typename B::element_t>;
+								template<class S> constexpr static type _do_append(S& _s, const TX* _data) { auto len_old = _s.size(); if(_data != nullptr) {const_cast<TX*>(_data)->serialize_out(_s);} else { _s.template _append<COUNT_T>(COUNT_T(0)-1);} return type(_s.data() + len_old, _s.size() - len_old);}
+							};
+template<class B, class T>	class serializer_extract<B, TSharedPtr<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
+							{	using TX = std::remove_const_t<T>;
+								public:	using type = TSharedPtr<TX>;
+								template<class S> constexpr static type _do_extract(S& _s) { TSharedPtr<TX> t = MakeShared<TX>(); t->serialize_in(_s); return t;}
+								template<class D, class S> constexpr static void _do_extract(D& _dest, S& _s) { _dest = MakeShared<TX>(); _dest->serialize_in(_s);}
+							};
+template<class B, class T>	class serializer_peek<B, TSharedPtr<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
+							{	using TX = std::remove_const_t<T>;
+								public:	using type = TSharedPtr<TX>;
+								template<class S> constexpr static type _do_peek(const S& _s, int64_t& _offset) { S tb =_s + static_cast<std::size_t>(_offset); type tx; tx->serialize_in(tb); return tx;}
+								template<class D, class S> constexpr static void _do_peek(D& _dest, const S& _s, int64_t& _offset) { S tb =_s + static_cast<std::size_t>(_offset); _dest->serialize_in(tb);}
+							};
+template<class T>			class serializer_size_of<TSharedPtr<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
+							{	using TX = std::remove_const_t<T>;
+								public:
+								constexpr static std::size_t  _get_append_size(const TX* _object) { return _object->get_size_of(); }
+								template<class S> 
+								constexpr static std::size_t  _get_extract_size(const S& _buffer, int64_t& _offset) noexcept { CGDK_ASSERT_ERROR; return 0;}
+							};
+
+// 2A) object_ptr<T>- Ibuffer_serializable
+template<class B, class T>	class serializer_append<B, TSharedRef<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
+							{	using TX = std::remove_const_t<T>;
+								public:	using type = _buffer_view<typename B::element_t>;
+								template<class S> constexpr static type _do_append(S& _s, const TX* _data) { auto len_old = _s.size(); if(_data != nullptr) {const_cast<TX*>(_data)->serialize_out(_s);} else { _s.template _append<COUNT_T>(COUNT_T(0)-1);} return type(_s.data() + len_old, _s.size() - len_old);}
+							};
+template<class B, class T>	class serializer_extract<B, TSharedRef<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
+							{	using TX = std::remove_const_t<T>;
+								public:	using type = TSharedRef<TX>;
+								template<class S> constexpr static type _do_extract(S& _s) { TSharedRef<TX> t = MakeShared<TX>(); t->serialize_in(_s); return t;}
+								template<class D, class S> constexpr static void _do_extract(D& _dest, S& _s) { _dest = MakeShared<TX>(); _dest->serialize_in(_s);}
+							};
+template<class B, class T>	class serializer_peek<B, TSharedRef<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
+							{	using TX = std::remove_const_t<T>;
+								public:	using type = TSharedRef<TX>;
+								template<class S> constexpr static type _do_peek(const S& _s, int64_t& _offset) { S tb =_s + static_cast<std::size_t>(_offset); type tx; tx->serialize_in(tb); return tx;}
+								template<class D, class S> constexpr static void _do_peek(D& _dest, const S& _s, int64_t& _offset) { S tb =_s + static_cast<std::size_t>(_offset); _dest->serialize_in(tb);}
+							};
+template<class T>			class serializer_size_of<TSharedRef<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
+							{	using TX = std::remove_const_t<T>;
+								public:
+								constexpr static std::size_t  _get_append_size(const TX* _object) { return _object->get_size_of(); }
+								template<class S> 
+								constexpr static std::size_t  _get_extract_size(const S& _buffer, int64_t& _offset) noexcept { CGDK_ASSERT_ERROR; return 0;}
+							};
+#else
+// 3A) object_ptr<T>- Ibuffer_serializable
 template<class B, class T>	class serializer_append<B, object_ptr<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
 							{	using TX = std::remove_const_t<T>;
 								public:	using type = _buffer_view<typename B::element_t>;
@@ -1253,7 +1418,7 @@ template<class T>			class serializer_size_of<object_ptr<T>, std::enable_if_t<std
 								constexpr static std::size_t  _get_extract_size(const S& _buffer, int64_t& _offset) noexcept { CGDK_ASSERT_ERROR; return 0;}
 							};
 
-// 3) own_ptr<T>- Ibuffer_serializable
+// 3B) own_ptr<T>- Ibuffer_serializable
 template<class B, class T>	class serializer_append<B, own_ptr<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
 							{	using TX = std::remove_const_t<T>;
 								public:	using type = _buffer_view<typename B::element_t>;
@@ -1261,7 +1426,7 @@ template<class B, class T>	class serializer_append<B, own_ptr<T>, std::enable_if
 							};
 template<class B, class T>	class serializer_extract<B, own_ptr<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
 							{	using TX = std::remove_const_t<T>;
-								public:	using type = own_ptr<TX>;
+								public:	using type = own_ptr<TX>&&;
 								template<class S> constexpr static type _do_extract(S& _s) { own_ptr<TX> t = make_own<TX>(); t->serialize_in(_s); return t;}
 								template<class D, class S> constexpr static void _do_extract(D& _dest, S& _s) { _dest = make_own<TX>(); _dest->serialize_in(_s);}
 							};
@@ -1279,12 +1444,13 @@ template<class T>			class serializer_size_of<own_ptr<T>, std::enable_if_t<std::i
 								constexpr static std::size_t  _get_extract_size(const S& _buffer, int64_t& _offset) noexcept { CGDK_ASSERT_ERROR; return 0; }
 							};
 #endif
+#endif
 
-// 4) std::shared_ptr<T>- Ibuffer_serializable
+// 2) std::shared_ptr<T>- Ibuffer_serializable
 template<class B, class T>	class serializer_append<B, std::shared_ptr<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
 							{	using TX = std::remove_const_t<T>;
 								public:	using type = _buffer_view<typename B::element_t>;
-								template<class S> constexpr static type _do_append(S& _s, const std::shared_ptr<T>& _data) { auto len_old = _s.size(); if(_data != nullptr) { _data->serialize_out(_s);} else { _s.template _append<COUNT_T>(COUNT_T(0)-1);} return type(_s.data() + len_old, _s.size() - len_old);}
+								template<class S> constexpr static type _do_append(S& _s, const TX* _data) { auto len_old = _s.size(); if(_data != nullptr) {const_cast<TX*>(_data)->serialize_out(_s);} else { _s.template _append<COUNT_T>(COUNT_T(0)-1);} return type(_s.data() + len_old, _s.size() - len_old);}
 							};
 template<class B, class T>	class serializer_extract<B, std::shared_ptr<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
 							{	using TX = std::remove_const_t<T>;
@@ -1301,33 +1467,7 @@ template<class B, class T>	class serializer_peek<B, std::shared_ptr<T>, std::ena
 template<class T>			class serializer_size_of<std::shared_ptr<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
 							{	using TX = std::remove_const_t<T>;
 								public:
-								constexpr static std::size_t  _get_append_size(const std::shared_ptr<T>& _object) { return _object->get_size_of(); }
-								template<class S> 
-								constexpr static std::size_t  _get_extract_size(const S& _buffer, int64_t& _offset) noexcept { CGDK_ASSERT_ERROR; return 0;}
-							};
-
-// 5) std::unique_ptr<T>- Ibuffer_serializable
-template<class B, class T>	class serializer_append<B, std::unique_ptr<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
-							{	using TX = std::remove_const_t<T>;
-								public:	using type = _buffer_view<typename B::element_t>;
-								template<class S> constexpr static type _do_append(S& _s, const std::unique_ptr<T>& _data) { auto len_old = _s.size(); if(_data != nullptr) { _data->serialize_out(_s);} else { _s.template _append<COUNT_T>(COUNT_T(0)-1);} return type(_s.data() + len_old, _s.size() - len_old);}
-							};
-template<class B, class T>	class serializer_extract<B, std::unique_ptr<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
-							{	using TX = std::remove_const_t<T>;
-								public:	using type = std::unique_ptr<TX>;
-								template<class S> constexpr static type _do_extract(S& _s) { std::unique_ptr<TX> t = std::make_unique<TX>(); t->serialize_in(_s); return t;}
-								template<class D, class S> constexpr static void _do_extract(D& _dest, S& _s) { _dest = std::make_unique<TX>(); _dest->serialize_in(_s);}
-							};
-template<class B, class T>	class serializer_peek<B, std::unique_ptr<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
-							{	using TX = std::remove_const_t<T>;
-								public:	using type = std::unique_ptr<TX>;
-								template<class S> constexpr static type _do_peek(const S& _s, int64_t& _offset) { S tb =_s + static_cast<std::size_t>(_offset); type tx; tx->serialize_in(tb); return tx;}
-								template<class D, class S> constexpr static void _do_peek(D& _dest, const S& _s, int64_t& _offset) { S tb =_s + static_cast<std::size_t>(_offset); _dest->serialize_in(tb);}
-							};
-template<class T>			class serializer_size_of<std::unique_ptr<T>, std::enable_if_t<std::is_base_of_v<Ibuffer_serializable, T>>>
-							{	using TX = std::remove_const_t<T>;
-								public:
-								constexpr static std::size_t  _get_append_size(const std::unique_ptr<T>& _object) { return _object->get_size_of(); }
+								constexpr static std::size_t  _get_append_size(const TX* _object) { return _object->get_size_of(); }
 								template<class S> 
 								constexpr static std::size_t  _get_extract_size(const S& _buffer, int64_t& _offset) noexcept { CGDK_ASSERT_ERROR; return 0;}
 							};
@@ -1485,7 +1625,7 @@ template<class B, class T>	class serializer_extract<B, object_ptr<T>, std::enabl
 								}
 								template<class D, class S> constexpr static void _do_extract(D& _dest, S& _s)
 								{
-									_dest = make_object<TX>();
+									_dest = MakeShared<TX>();
 
 									auto result = _dest.ParseFromArray(_s.template data<void>(), _s.template size<int>());
 
@@ -1508,7 +1648,7 @@ template<class B, class T>	class serializer_peek<B, object_ptr<T>, std::enable_i
 								{
 									S tb =_s + static_cast<std::size_t>(_offset);
 
-									_dest = make_object<TX>();
+									_dest = MakeShared<TX>();
 
 									auto result = _dest.ParseFromArray(tb.template data<void>(), tb.template size<int>());
 
@@ -2348,14 +2488,14 @@ template<typename T>		class serializer_size_of<T, std::enable_if_t<is_associativ
 //-----------------------------------------------------------------------------
 // aggrigate structure (reflection)
 //-----------------------------------------------------------------------------
-template <std::size_t ISIZE>	constexpr std::size_t align_offset_pre     (std::size_t _source, std::size_t _add);
-template <>						constexpr std::size_t align_offset_pre< 1> (std::size_t _source, std::size_t) { return _source; }
-template <>						constexpr std::size_t align_offset_pre< 2> (std::size_t _source, std::size_t _add) { return (!(_source & 0x01) || _add <= 1) ? _source : _source + 1;}
-template <>						constexpr std::size_t align_offset_pre< 4> (std::size_t _source, std::size_t _add) { auto remained = (_source & 0x03); return (remained == 0 || ( 4 - remained) >= _add) ? _source : ((_source & (~0x03)) +  4);}
-template <>						constexpr std::size_t align_offset_pre< 8> (std::size_t _source, std::size_t _add) { auto remained = (_source & 0x07); return (remained == 0 || ( 8 - remained) >= _add) ? _source : ((_source & (~0x07)) +  8);}
-template <>						constexpr std::size_t align_offset_pre<16> (std::size_t _source, std::size_t _add) { auto remained = (_source & 0x0f); return (remained == 0 || (16 - remained) >= _add) ? _source : ((_source & (~0x0f)) + 16);}
-template <>						constexpr std::size_t align_offset_pre<32> (std::size_t _source, std::size_t _add) { auto remained = (_source & 0x1f); return (remained == 0 || (32 - remained) >= _add) ? _source : ((_source & (~0x1f)) + 32);}
-template <>						constexpr std::size_t align_offset_pre<64> (std::size_t _source, std::size_t _add) { auto remained = (_source & 0x3f); return (remained == 0 || (64 - remained) >= _add) ? _source : ((_source & (~0x3f)) + 64);}
+template <std::size_t ISIZE>	constexpr std::size_t alliened_offset_pre     (std::size_t _source, std::size_t _add);
+template <>						constexpr std::size_t alliened_offset_pre< 1> (std::size_t _source, std::size_t) { return _source; }
+template <>						constexpr std::size_t alliened_offset_pre< 2> (std::size_t _source, std::size_t _add) { return (!(_source & 0x01) || _add <= 1) ? _source : _source + 1;}
+template <>						constexpr std::size_t alliened_offset_pre< 4> (std::size_t _source, std::size_t _add) { auto remained = (_source & 0x03); return (remained == 0 || ( 4 - remained) >= _add) ? _source : ((_source & (~0x03)) +  4);}
+template <>						constexpr std::size_t alliened_offset_pre< 8> (std::size_t _source, std::size_t _add) { auto remained = (_source & 0x07); return (remained == 0 || ( 8 - remained) >= _add) ? _source : ((_source & (~0x07)) +  8);}
+template <>						constexpr std::size_t alliened_offset_pre<16> (std::size_t _source, std::size_t _add) { auto remained = (_source & 0x0f); return (remained == 0 || (16 - remained) >= _add) ? _source : ((_source & (~0x0f)) + 16);}
+template <>						constexpr std::size_t alliened_offset_pre<32> (std::size_t _source, std::size_t _add) { auto remained = (_source & 0x1f); return (remained == 0 || (32 - remained) >= _add) ? _source : ((_source & (~0x1f)) + 32);}
+template <>						constexpr std::size_t alliened_offset_pre<64> (std::size_t _source, std::size_t _add) { auto remained = (_source & 0x3f); return (remained == 0 || (64 - remained) >= _add) ? _source : ((_source & (~0x3f)) + 64);}
 
 namespace reflection
 {

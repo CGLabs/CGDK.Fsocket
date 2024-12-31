@@ -27,17 +27,14 @@ namespace CGDK
 //-----------------------------------------------------------------------------
 template <class TMSG_HEAD = uint32_t>
 class net::io::packetable::Nstream :
-// Inherited classes)
-	virtual public				net::io::Isocket,
+	virtual public				net::io::Isocket_tcp,
 	virtual public				net::io::Ipacketable,
 	virtual public				Imessageable,
 	virtual public				net::io::statistics::Nsocket
 {
-// Definitions)
 public:
 			using TMESSAGE_HEAD = TMSG_HEAD;
 
-// implementation)
 protected:
 	virtual	void				process_pre_message(sMESSAGE_NETWORK& /*_msg*/) {}
 	virtual	std::size_t			process_packet( shared_buffer& _buffer, const TSharedPtr<FInternetAddr>& _address_peer) override;

@@ -23,48 +23,63 @@ namespace CGDK
 //-----------------------------------------------------------------------------
 /**
 
- @class		Nmessage_transmitter
-
+ @class		Imessage_transmitter
 
 */
 //-----------------------------------------------------------------------------
-class Nmessage_transmitter : virtual public Imessage_transmitter
+#define	MAX_MEDIATOR	8
+
+class Nmessage_transmitter
 {
+public:
+	virtual ~Nmessage_transmitter() noexcept {}
+
+public:
+			bool				register_messageable(TSharedPtr<Imessageable>&& _pmessageable);
+			bool				unregister_messageable(Imessageable* _pmessageable) noexcept;
+			int					reset_message_transmitter() noexcept;
+			result_code			transmit_message(sMESSAGE& _msg);
+
 protected:
-	virtual	bool				on_messageable_attaching(Imessageable* /*_pmessageable*/) { return true;}
+	virtual	bool				on_messageable_attaching(Imessageable* /*_pmessageable*/) { return true; }
 	virtual	void				on_messageable_attached(Imessageable* /*_pmessageable*/) {}
 	virtual	void				on_messageable_detaching(Imessageable* /*_pmessageable*/) {}
 	virtual	void				on_messageable_detached(Imessageable* /*_pmessageable*/) {}
 
 protected:
-	virtual result_code			process_transmit_message(sMESSAGE& _msg) override;
 
-	virtual bool				process_attach(Imessageable* _pmessageable) override { return this->process_attach_messageable_back(_pmessageable);}
-	virtual bool				process_detach(Imessageable* _pmessageable) noexcept override;
-	virtual int					process_reset_message_transmitter() noexcept override;
-			bool				process_attach_messageable_back(Imessageable* _pmessageable);
 private:
-			std::mutex			m_lockable_array_messageable;
-			std::array<object_ptr<Imessageable>, MAX_MEDIATOR> m_array_messageable;
+			FCriticalSection	m_lockable_array_messageable;
+			std::array<TSharedPtr<Imessageable>, MAX_MEDIATOR> m_array_messageable;
 			int					m_array_messageable_size = 0;
 };
 
-inline result_code Nmessage_transmitter::process_transmit_message(sMESSAGE& _msg)
+// definitions)
+#define	TRANSMIT_MESSAGE(msg)				\
+{											\
+	auto __result__ = transmit_message(msg);\
+	if(__result__ != eRESULT::BYPASS)		\
+		return __result__;					\
+}
+
+inline result_code Nmessage_transmitter::transmit_message(sMESSAGE& _msg)
 {
 	// declare)
-	std::array<object_ptr<Imessageable>, MAX_MEDIATOR> array_messageable;
+	std::array<TSharedPtr<Imessageable>, MAX_MEDIATOR> array_messageable;
 	int array_messageable_size;
 
 	// 1) copy messageable list for temporary
-	scoped_lock(this->m_lockable_array_messageable)
 	{
+		// lock) 
+		FScopeLock cs(&this->m_lockable_array_messageable);
+
 		array_messageable_size = this->m_array_messageable_size;
 		auto iter_src = this->m_array_messageable.begin();
 		auto iter_src_end = iter_src + array_messageable_size;
 		auto iter_dest = array_messageable.begin();
 
 		// - on_messageable_detaching
-		while(iter_src != iter_src_end)
+		while (iter_src != iter_src_end)
 		{
 			*iter_dest = *iter_src;
 
@@ -87,94 +102,15 @@ inline result_code Nmessage_transmitter::process_transmit_message(sMESSAGE& _msg
 	return result_code(eRESULT::BYPASS);
 }
 
-inline bool Nmessage_transmitter::process_detach(Imessageable* _pmessageable) noexcept
-{
-	// 1)  if nulll, remove all
-	if (_pmessageable == nullptr)
-	{
-		return this->process_reset_message_transmitter() != 0;
-	}
-
-	scoped_lock(m_lockable_array_messageable)
-	{
-		// check)
-		RETURN_IF(this->m_array_messageable_size == 0, false);
-		
-		for(auto iter = this->m_array_messageable.begin(), iter_end = iter + this->m_array_messageable_size; iter!=iter_end; ++iter)
-		{
-			if (*iter == _pmessageable)
-			{
-				// - call 'on_messageable_detaching'
-				this->on_messageable_detaching(_pmessageable);
-
-				if (iter != iter_end)
-				{
-					do
-					{
-						auto iter_pre = iter++;
-						*iter_pre = std::move(*iter);
-					} while (iter != iter_end);
-				}
-				else
-				{
-					(*iter).reset();
-				}
-				--this->m_array_messageable_size;
-				break;
-			}
-		}
-	}
-
-	// 4) call 'on_messageable_detached'
-	this->on_messageable_detached(_pmessageable);
-
-	// 5) release
-	this->release();
-
-	// return) 
-	return true;
-}
-
-inline int Nmessage_transmitter::process_reset_message_transmitter() noexcept
-{
-	// declare) 
-	std::array<object_ptr<Imessageable>, MAX_MEDIATOR> array_messageable;
-	int array_messageable_size = 0;
-
-	scoped_lock(this->m_lockable_array_messageable)
-	{
-		// - Swap
-		array_messageable = std::move(this->m_array_messageable);
-		array_messageable_size = this->m_array_messageable_size;
-		this->m_array_messageable_size = 0;
-
-		// - on_messageable_detaching
-		for (auto iter = array_messageable.begin(), iter_end = iter + array_messageable_size; iter != iter_end; ++iter)
-		{
-			this->on_messageable_detaching(*iter);
-		}
-	}
-
-	for (auto iter = array_messageable.begin(), iter_end = iter + array_messageable_size; iter != iter_end; ++iter)
-	{
-		// - on_messageable_detached
-		this->on_messageable_detached(*iter);
-
-		// - Release한다.
-		this->release();
-	}
-
-	// return)
-	return array_messageable_size;
-}
-
-inline bool Nmessage_transmitter::process_attach_messageable_back(Imessageable* _pmessageable)
+inline bool Nmessage_transmitter::register_messageable(TSharedPtr<Imessageable>&& _pmessageable)
 {
 	// check) 
-	RETURN_IF(_pmessageable == nullptr, false);
+	RETURN_IF(!_pmessageable.IsValid(), false);
 
-	scoped_lock(this->m_lockable_array_messageable)
 	{
+		// lock) 
+		FScopeLock cs(&this->m_lockable_array_messageable);
+
 		// check) 
 		CGASSERT_ERROR(this->m_array_messageable_size < MAX_MEDIATOR);
 
@@ -196,7 +132,7 @@ inline bool Nmessage_transmitter::process_attach_messageable_back(Imessageable* 
 		}
 
 		// 1) OnRegistering
-		auto result = this->on_messageable_attaching(_pmessageable);
+		auto result = this->on_messageable_attaching(_pmessageable.Get());
 
 		// check) return if false
 		RETURN_IF(result == false, false);
@@ -205,15 +141,100 @@ inline bool Nmessage_transmitter::process_attach_messageable_back(Imessageable* 
 		this->m_array_messageable.at(this->m_array_messageable_size) = _pmessageable;
 		++this->m_array_messageable_size;
 
-		// 3) add reference count
-		this->add_ref();
+		//// 3) add reference count
+		//this->add_ref();
 	}
 
 	// 4) call 'on_messageable_attached'
-	this->on_messageable_attached(_pmessageable);
+	this->on_messageable_attached(_pmessageable.Get());
 
 	// return) 
 	return true;
+}
+
+inline bool Nmessage_transmitter::unregister_messageable(Imessageable* _pmessageable) noexcept
+{
+	// 1)  if nulll, remove all
+	if (_pmessageable == nullptr)
+	{
+		return this->reset_message_transmitter() != 0;
+	}
+
+	{
+		// lock) 
+		FScopeLock cs(&this->m_lockable_array_messageable);
+
+		// check)
+		RETURN_IF(this->m_array_messageable_size == 0, false);
+
+		for (auto iter = this->m_array_messageable.begin(), iter_end = iter + this->m_array_messageable_size; iter != iter_end; ++iter)
+		{
+			if (iter->Get() == _pmessageable)
+			{
+				// - call 'on_messageable_detaching'
+				this->on_messageable_detaching(_pmessageable);
+
+				if (iter != iter_end)
+				{
+					do
+					{
+						auto iter_pre = iter++;
+						*iter_pre = std::move(*iter);
+					} while (iter != iter_end);
+				}
+				else
+				{
+					(*iter).Reset();
+				}
+				--this->m_array_messageable_size;
+				break;
+			}
+		}
+	}
+
+	// 4) call 'on_messageable_detached'
+	this->on_messageable_detached(_pmessageable);
+
+	//// 5) release
+	//this->release();
+
+	// return) 
+	return true;
+}
+
+inline int Nmessage_transmitter::reset_message_transmitter() noexcept
+{
+	// declare) 
+	std::array<TSharedPtr<Imessageable>, MAX_MEDIATOR> array_messageable;
+	int array_messageable_size = 0;
+
+	{
+		// lock) 
+		FScopeLock cs(&this->m_lockable_array_messageable);
+
+		// - Swap
+		array_messageable = std::move(this->m_array_messageable);
+		array_messageable_size = this->m_array_messageable_size;
+		this->m_array_messageable_size = 0;
+
+		// - on_messageable_detaching
+		for (auto iter = array_messageable.begin(), iter_end = iter + array_messageable_size; iter != iter_end; ++iter)
+		{
+			this->on_messageable_detaching(iter->Get());
+		}
+	}
+
+	for (auto iter = array_messageable.begin(), iter_end = iter + array_messageable_size; iter != iter_end; ++iter)
+	{
+		// - on_messageable_detached
+		this->on_messageable_detached(iter->Get());
+
+		//// - Release한다.
+		//this->release();
+	}
+
+	// return)
+	return array_messageable_size;
 }
 
 

@@ -125,7 +125,7 @@ const CGDK::message_t eMESSAGE_MASK = 0x00ffffff;
 {																\
 	auto xcg_result = class_type::__execute_message(msg);		\
 																\
-	if(static_cast<uint64_t>(xcg_result) != static_cast<uint64_t>(eRESULT::BYPASS))							\
+	if(static_cast<uint64_t>(xcg_result) != static_cast<uint64_t>(eRESULT::BYPASS))	\
 		return xcg_result;										\
 }
 

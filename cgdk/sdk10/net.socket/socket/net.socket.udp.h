@@ -26,12 +26,10 @@ namespace CGDK
 //
 //-----------------------------------------------------------------------------
 class net::socket::udp : 
-// Inherited classes)
 	public						net::io::Nsocket_udp,
-	public						net::io::send_request::Nbase,
-	public						net::io::sender::Ndatagram,
-	public						net::io::packetable::Ndatagram,
-	public						net::io::messageable::Nbase
+	public						net::io::sender::udp::Ndefault,
+	public						net::io::packetable::udp::Ndefault,
+	public						net::io::messageable::udp::Ndefault
 {
 };
 

@@ -1,7 +1,7 @@
 ﻿//*****************************************************************************
 //*                                                                           *
 //*                               CGDK::buffer                                *
-//*                       ver 3.03 / release 2023.10.17                       *
+//*                       ver 5.0 / release 2021.11.01                        *
 //*                                                                           *
 //*                                                                           *
 //*                                                                           *
@@ -17,7 +17,7 @@
 namespace CGDK
 {
 
-#if !defined(_CGDK)
+#if !defined(_CGDK) || defined(_UNREAL)
 class Imemory : protected _buffer_view<char>
 {
 public:

@@ -1,7 +1,7 @@
 //*****************************************************************************
 //*                                                                           *
 //*                               CGDK::buffer                                *
-//*                       ver 3.03 / release 2023.10.17                       *
+//*                       ver 5.0 / release 2021.11.01                        *
 //*                                                                           *
 //*                                                                           *
 //*                                                                           *
@@ -14,13 +14,13 @@
 
 #pragma once
 
-#if !defined(_CGDK)
+#if !defined(_CGDK) || defined(_UNREAL)
 	#include <malloc.h>
 #endif
 
 namespace CGDK
 {
-#if !defined(_CGDK)
+#if !defined(_CGDK) || defined(_UNREAL)
 
 // definitions
 #define	alloc_shared_buffer(size)		CGDK::_alloc_shared_buffer(size)
@@ -43,7 +43,11 @@ public:
 inline _shared_buffer<buffer> _alloc_shared_buffer(std::size_t _size)
 {
 	// 1) alloc memory object
+#if defined(_UNREAL)
+	auto temp = MakeShared<memory_general>(_size);
+#else
 	auto temp = std::make_shared<memory_general>(_size);
+#endif
 
 	// declare)
 	_shared_buffer<buffer> buf_serialized;

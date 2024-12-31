@@ -22,16 +22,13 @@ namespace CGDK
 {
 //-----------------------------------------------------------------------------
 //
-// net::io::Nsocket_tcp
+// net::io::Nsocket_udptcp
 //
 //-----------------------------------------------------------------------------
 class net::io::Nsocket_udp :
-// inherited classes)
 	virtual public				Isocket,
 	virtual public				net::io::statistics::Nsocket,
-	virtual public				net::io::Isendable,
-	virtual public				net::io::Ipacketable,
-	virtual public				net::io::Iclosable
+	virtual public				net::io::Ipacketable
 {
 public:
 			Nsocket_udp() {}
@@ -56,7 +53,7 @@ protected:
 	virtual	void				on_closesocket(uint64_t _disconnect_reason) {}
 
 protected:
-	virtual	bool				process_sendable(net::io::Isend_completor* _psend_completor, const buffer_view* _array_buffer, std::size_t _count_buffer, Ireferenceable* _powner, std::size_t _count_message, const FInternetAddr& _address) override;
+	virtual	bool				process_sendable(shared_buffer&& _buffer, std::size_t _count_message, const FInternetAddr& _address);
 	virtual void				process_on_receive (const buffer_view& _buffer, const FInternetAddr& _address) { on_receive(_buffer, _address); }
 			void				process_receiving();
 	virtual	bool				process_closesocket(uint64_t _disconnect_reason = DISCONNECT_REASON_NONE) noexcept override;
@@ -153,29 +150,39 @@ inline bool net::io::Nsocket_udp::bind(FInternetAddr& _endpoint_bind)
 	RETURN_IF(get_socket_state() >= eSOCKET_STATE::BINDED, false);
 
 	// 2) get socket handle
-	FSocket* psocket = native_handle();
+	auto psocket = this->native_handle();
 
 	// 1) create new socket object
-	if (psocket == nullptr)
+	if (!psocket.IsValid())
 	{
 		// - create new socke object
-		psocket = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("default"), false);
+		auto psocket_raw = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateSocket(NAME_Stream, TEXT("default"), false);
 
 		// check)
-		check(psocket != nullptr);
+		check(psocket_raw != nullptr);
 
 		// check)
-		ERROR_THROW_IF(psocket == nullptr, std::exception(), )
+		ERROR_THROW_IF(psocket_raw == nullptr, std::exception(), )
 
 		// - set socket option
-		psocket->SetNonBlocking(true);
-		psocket->SetReuseAddr(true);
+		psocket_raw->SetNonBlocking(true);
+		psocket_raw->SetReuseAddr(true);
+
+		// - make shared
+		psocket = MakeShareable<FSocket>(psocket_raw, [](FSocket* _psocket)
+				{
+					// check)
+					RETURN_IF(_psocket == nullptr, );
+
+					// - destroy
+					ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(_psocket);
+				});
 
 		// - set socket object
-		native_handle(psocket);
+		this->native_handle(TSharedPtr<FSocket>(psocket));
 
-		// 2) socket을 Closed로 한다.
-		set_socket_state(eSOCKET_STATE::CLOSED);
+		// - socket을 Closed로 한다.
+		this->set_socket_state(eSOCKET_STATE::CLOSED);
 	}
 
 	// 2) set socket status as eSOCKET_STATE::SYN only if socket status is eSOCKET_STATE::CLOSED
@@ -185,7 +192,7 @@ inline bool net::io::Nsocket_udp::bind(FInternetAddr& _endpoint_bind)
 	RETURN_IF(is_changed == false, false);
 
 	// 3) reset statistics info
-	reset_statistics();
+	this->reset_statistics();
 
 	// trace) 
 	//LOG_INFO_LOW(DEFAULT_LOGGER, "(info) CGDK.net.socket: binding tcp socket ({}) ({})", to_string<char>(socket_address()).c_str(), __FUNCTION__);
@@ -207,7 +214,7 @@ inline bool net::io::Nsocket_udp::bind(FInternetAddr& _endpoint_bind)
 	on_bind();
 
 	// 6) register to socket executor
-	executor::socket::get_instance()->attach(this);
+	executor::socket::get_instance()->attach(this->AsShared());
 
 	// return) 
 	return	true;
@@ -218,36 +225,30 @@ inline bool net::io::Nsocket_udp::closesocket(uint64_t _disconnect_reason) noexc
 	return process_closesocket(_disconnect_reason);
 }
 
-inline bool net::io::Nsocket_udp::process_sendable(net::io::Isend_completor* _psend_completor, const buffer_view* _array_buffer, std::size_t _count_buffer, Ireferenceable* _powner, std::size_t _count_message, const FInternetAddr& _address)
+inline bool net::io::Nsocket_udp::process_sendable(shared_buffer&& _buffer, std::size_t _count_message, const FInternetAddr& _address)
 {
 	// check)
-	check(_array_buffer != nullptr);
-	check(_count_buffer == 1);
-	check(_powner != nullptr);
+	check(_buffer.exist());
+
+	shared_buffer buf_send = std::move(_buffer);
 
 	// check) return if socket state is not CLOSED
-	RETURN_IF(get_socket_state() < eSOCKET_STATE::BINDED, false);
+	RETURN_IF(this->get_socket_state() < eSOCKET_STATE::BINDED, false);
 
 	// 1) get socket handle
-	auto psocket = native_handle();
+	auto psocket = this->native_handle();
 
 	// check) 
-	check(psocket != nullptr);
+	check(psocket.IsValid());
 
 	// check) return if psocket is nullptr
-	RETURN_IF(psocket == nullptr, false);
+	RETURN_IF(!psocket.IsValid(), false);
 
 	// declare)
-	int32_t bytes_send = 0;
+	int32 bytes_send{ 0 };
 
 	// 2) send
-	auto result = psocket->SendTo(_array_buffer->data<uint8>(), _array_buffer->size<int32_t>(), bytes_send, _address);
-
-	// 4) complete sending
-	if (_psend_completor != nullptr)
-	{
-		_psend_completor->process_complete_send(result, _array_buffer->size(), _count_message); // (uintptr_t _return, std::size_t _transferred_bytes, std::size_t _transferred_message)
-	}
+	auto result = psocket->SendTo(buf_send.data<uint8>(), buf_send.size<int32>(), bytes_send, _address);
 
 	// return) 
 	return result;
@@ -314,7 +315,7 @@ inline bool net::io::Nsocket_udp::process_closesocket(uint64_t _disconnect_reaso
 	executor::socket::get_instance()->detach(this);
 
 	// 2) set state
-	set_socket_state(eSOCKET_STATE::CLOSED);
+	this->set_socket_state(eSOCKET_STATE::CLOSED);
 
 	// 3) call 'on_closesocket()'
 	on_closesocket(_disconnect_reason);
@@ -323,7 +324,7 @@ inline bool net::io::Nsocket_udp::process_closesocket(uint64_t _disconnect_reaso
 	psocket->Close();
 
 	// 5) ...
-	ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(psocket);
+	ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(psocket.Get());
 
 	// return)
 	return true;

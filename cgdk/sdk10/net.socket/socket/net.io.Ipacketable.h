@@ -25,9 +25,7 @@ namespace CGDK
 // net::io::Ipacketable
 //
 //-----------------------------------------------------------------------------
-class net::io::Ipacketable :
-// Inherited classes)
-	virtual public				Ireferenceable
+class net::io::Ipacketable
 {
 public:
 	virtual	std::size_t			process_packet(shared_buffer& _buffer, const TSharedPtr<FInternetAddr>& _address) PURE;

@@ -165,8 +165,6 @@ public:
 			bool				has_source() const noexcept { return source != 0;}
 			template <class TSOURCE>										  
 			void				set_source(const TSOURCE& _source) noexcept { this->source = reinterpret_cast<uint64_t>(const_cast<TSOURCE>(_source));}
-			//template <class TSOURCE>
-			//void				set_source(const TSOURCE* _source) noexcept { this->source = reinterpret_cast<uint64_t>(const_cast<TSOURCE*>(_source)); }
 public:
 			message_t			message;
 protected:

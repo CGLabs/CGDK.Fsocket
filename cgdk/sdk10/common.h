@@ -59,15 +59,18 @@
 #include <mutex>
 #include <shared_mutex>
 #include <string>
+#include <array>
 
-// 2) containers
-#include "containers/circular_list"
+#if defined(__cpp_lib_format)
+	#include <format>
+	#define NFMT std
+#else
+	#error "std::format not supported (use c++20)"
+#endif
 
-
-//-----------------------------------------------------------------------------
-// Basic)
-//-----------------------------------------------------------------------------
-#include "definitions.unreal.h"
+// 2) string literals
+using namespace std::literals::string_literals;
+using namespace std::literals::string_view_literals;
 
 
 //-----------------------------------------------------------------------------
@@ -94,8 +97,32 @@
 //-----------------------------------------------------------------------------
 #include "common/definitions.h"
 #include "common/definitions.assert.h"
-#include "common/lockable.h"
-#include "common/scoped_lock.h"
 #include "common/definition.timer.h"
 #include "common/definitions.message.h"
 #include "common/message_map.h"
+
+namespace CGDK
+{
+	struct sMAC_ADDRESS
+	{
+	public:
+		union
+		{
+			std::array<uint8_t, 8>	sll_addr;
+			uint64_t				sll_mac;
+		};
+
+	public:
+		constexpr sMAC_ADDRESS() noexcept : sll_mac(0) {}
+
+	public:
+		[[nodiscard]] constexpr bool empty() const noexcept { return sll_mac == 0; }
+		[[nodiscard]] constexpr bool exist() const noexcept { return sll_mac != 0; }
+		constexpr void clear() noexcept { sll_mac = 0; }
+
+	public:
+		constexpr sMAC_ADDRESS& operator =  (const sMAC_ADDRESS& _rhs) noexcept { sll_mac = _rhs.sll_mac; return *this; }
+		constexpr sMAC_ADDRESS& operator =  (uint64_t _rhs) noexcept { sll_mac = _rhs; return *this; }
+		[[nodiscard]] constexpr	operator uint64_t() const noexcept { return static_cast<uint64_t>(sll_mac); }
+	};
+}
