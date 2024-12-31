@@ -6,9 +6,13 @@
 #include "executor_TickableWorldSubsystem.generated.h"
 
 UCLASS()
-class TEST_MMOG_API Uexecutor_TickableWorldSubsystem : public UTickableWorldSubsystem
+class Uexecutor_TickableWorldSubsystem : public UTickableWorldSubsystem
 {
 	GENERATED_BODY()
+	Uexecutor_TickableWorldSubsystem() noexcept { CGDK::executor::socket::initialize_instance(); }
+	virtual ~Uexecutor_TickableWorldSubsystem() noexcept { CGDK::executor::socket::destory_executor(); }
 	virtual TStatId GetStatId() const override { RETURN_QUICK_DECLARE_CYCLE_STAT(YouClassName, STATGROUP_Tickables); }
 	virtual void Tick(float DeltaTime) override { CGDK::executor::socket::run_executor(); }
+
+
 };

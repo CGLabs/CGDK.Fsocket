@@ -49,15 +49,12 @@ namespace CGDK
 		namespace io
 		{
 			class Isocket;
-			class Iclosable;
+			class Isocket_tcp;
+			class Isocket_udp;
 			class Iaddress;
 			class Iconnective;
-			class Iconnectable;
-			class Isendable;
-			class Isend_request;
 			class Isender;
 			class Isender_datagram;
-			class Isend_completor;
 			class Ipacketable;
 
 			namespace socket
@@ -74,15 +71,10 @@ namespace CGDK
 
 			namespace sender
 			{
-				class Ndatagram;
 				class Nstream;
 				template <class,class> class Nheader;
 				template <class> class Nstream_header;
-			}
-
-			namespace send_request
-			{
-				class Nbase;
+				class Ndatagram;
 			}
 
 			namespace packetable
@@ -131,8 +123,7 @@ namespace CGDK
 // 1) UE4 socket header files
 #include "Sockets.h"
 #include "SocketSubSystem.h"
-#include "Interfaces/IPv4/IPv4Endpoint.h"
-#include "IPAddress.h"
+#include "Networking.h"
 
 // 2) object system
 #include "../sdk10/system.object.h"
@@ -151,13 +142,7 @@ namespace CGDK
 #include "net.socket/socket/net.message.h"
 
 // 7) interfaces
-#include "net.socket/socket/net.io.Iaddress.h"
 #include "net.socket/socket/net.io.Isocket.h"
-#include "net.socket/socket/net.io.Iclosable.h"
-#include "net.socket/socket/net.io.Iconnectable.h"
-#include "net.socket/socket/net.io.Isendable.h"
-#include "net.socket/socket/net.io.Isend_completor.h"
-#include "net.socket/socket/net.io.Isend_request.h"
 #include "net.socket/socket/net.io.Isender.h"
 #include "net.socket/socket/net.io.Ipacketable.h"
 
@@ -168,25 +153,22 @@ namespace CGDK
 //----------------------------------------------------------------------------
 // component Classes
 //----------------------------------------------------------------------------
-// 1) send requestor
-#include "net.socket/socket/net.io.send_request.h"
-
-// 2) sender
+// 1) sender
 #include "net.socket/socket/net.io.sender.stream.h"
 #include "net.socket/socket/net.io.sender.stream_header.h"
 #include "net.socket/socket/net.io.sender.datagram.h"
 
-// 3) packetable
+// 2) packetable
 #include "net.socket/socket/net.io.packetable.stream.h"
 #include "net.socket/socket/net.io.packetable.datagram.h"
 
-// 4) messageable
+// 3) messageable
 #include "net.socket/socket/net.io.messageable.h"
 
-// 5) tcp/udp
-#include "net.socket/socket/net.Nsocket_tcp.h"
-#include "net.socket/socket/net.Nsocket_tcp_client.h"
-#include "net.socket/socket/net.Nsocket_udp.h"
+// 4) tcp/udp
+#include "net.socket/socket/net.Nsocket.tcp.h"
+#include "net.socket/socket/net.Nsocket.tcp_client.h"
+#include "net.socket/socket/net.Nsocket.udp.h"
 
 
 //----------------------------------------------------------------------------

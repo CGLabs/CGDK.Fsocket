@@ -105,15 +105,7 @@ namespace io
 	{
 		namespace tcp
 		{
-			using Ndefault	 = net::io::socket::Ntcp;
-		}
-	}
-
-	namespace send_request
-	{
-		namespace tcp
-		{
-		using Ndefault = net::io::send_request::Nbase;
+			using Ndefault = net::io::socket::Ntcp;
 		}
 	}
 
@@ -123,6 +115,10 @@ namespace io
 		{
 			template <class HEADER_T = uint32_t> using Ndefault = net::io::sender::Nstream_header<HEADER_T>;
 		}
+		namespace udp
+		{
+			using Ndefault = net::io::sender::Ndatagram;
+		}
 	}
 
 	namespace packetable
@@ -131,13 +127,21 @@ namespace io
 		{
 			template <class HEADER_T = uint32_t> using Ndefault = net::io::packetable::Nstream<HEADER_T>;
 		}
+		namespace udp
+		{
+			using Ndefault = net::io::packetable::Ndatagram;
+		}
 	}
 
 	namespace messageable
 	{
 		namespace tcp
 		{
-			using Ndefault	= net::io::messageable::Nbase;
+			using Ndefault = net::io::messageable::Nbase;
+		}
+		namespace udp
+		{
+			using Ndefault = net::io::messageable::Nbase;
 		}
 	}
 }

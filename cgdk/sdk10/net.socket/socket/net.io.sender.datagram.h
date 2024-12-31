@@ -26,17 +26,15 @@ namespace CGDK
 //
 //-----------------------------------------------------------------------------
 class net::io::sender::Ndatagram : 
-// Inherited classes)
-	virtual public				net::io::Isend_request,
 	virtual public				net::io::Isender_datagram,
+	virtual public				net::io::Isocket_udp,
 	virtual public				net::io::statistics::Nsocket
 {
 public:
-	virtual	bool				process_send( const shared_buffer& _buffer, const FInternetAddr& _address, uint64_t _option = 0) override;
+	virtual	bool				process_send(shared_buffer&& _buffer, const FInternetAddr& _address, uint64_t _option) override;
 };
 
-
-inline bool net::io::sender::Ndatagram::process_send( const shared_buffer& _buffer, const FInternetAddr& _address, uint64_t _option)
+inline bool net::io::sender::Ndatagram::process_send(shared_buffer&& _buffer, const FInternetAddr& _address, uint64_t _option)
 {
 	// check) _array_buffer->data_가 nullptr이 아닌가?
 	check(_buffer.data() != nullptr)
@@ -48,8 +46,7 @@ inline bool net::io::sender::Ndatagram::process_send( const shared_buffer& _buff
 	check(_buffer._is_buffer_overflow() == false);
 
 	// 1) request send
-	return request_send(nullptr, &_buffer, 1, _buffer.get_source(), 1, _address);
+	return this->process_sendable(std::move(_buffer), 1, _address);
 }
-
 
 }

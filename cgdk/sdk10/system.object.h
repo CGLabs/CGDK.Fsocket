@@ -35,12 +35,13 @@ namespace CGDK
 	namespace object
 	{
 		template <class TTYPE> class Iattachable;
-		template <typename TTYPE, typename TCON = std::vector<object_ptr<TTYPE>>> class Nattachable;
-		class Idestroyable;
+		template <typename TTYPE, typename TCON = std::vector<TSharedPtr<TTYPE>>> class Nattachable;
 	}
 
 	class Imessage_transmitter;
 }
+
+#define _UNREAL
 
 //----------------------------------------------------------------------------
 // head files
@@ -49,10 +50,7 @@ namespace CGDK
 #include "../sdk10/common.h"
 
 // 2) chrono
-#include "system/object/chrono.h"
 #include "system/object/chrono_tick.h"
-#include "system/object/chrono_time.h"
-#include "system/object/chrono_time_client.h"
 
 // 3) object definitions
 #include "system/object/definitions.object.h"
@@ -61,35 +59,23 @@ namespace CGDK
 // 4) traits
 #include "system/object/object_traits.h"
 
-// 5) disposable & reference counting
-#include "system/object/Idisposable.h"
-#include "system/object/Ireferenceable.h"
-#include "system/object/object_ptr.h"
-
-// 6) referenceable 
-#include "system/object/referenceable.Nno_act.h"
-
 // 7) object allocation
-#include "system/object/obj.h"
-#include "system/object/make_object.h"
-#include "system/object/make_object_raw.h"
-#include "system/object/make_own.h"
 #include "system/object/throwable.h"
 
 // 8) buffer
 #include "../buffer"
-#include "system/object/Imemory.h"
 #include "../shared_buffer"
 #include "../buffers/_buffer_unreal.h"
-#include "system/object/make_shared_buffer.h"
+#include "common/definitions.system.h"
+#include "common/definitions.cgdk.h"
 
 // 9) etc
-#include "system/object/object.Iattachable.h"
 #include "system/object/Imessageable.h"
-#include "system/object/Imessage_transmitter.h"
 #include "system/object/Nmessage_transmitter.h"
-#include "system/object/Idestroyable.h"
-#include "system/object/own_ptr.h"
 
 // 10) definitions for buffer
 #include "system/object/definitions.buffer.h"
+
+// 11) admin
+#include "system/object/definitions.admin.h"
+

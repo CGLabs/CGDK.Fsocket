@@ -26,20 +26,17 @@ namespace CGDK
 //
 //-----------------------------------------------------------------------------
 class net::io::Nsocket_tcp : 
-	virtual public				Isocket,
+	virtual public				Isocket_tcp,
 	virtual public				net::io::statistics::Nsocket,
-	virtual public				net::io::Iconnectable,
-	virtual public				net::io::Isendable,
 	virtual public				net::io::Ipacketable,
 	virtual public				Imessageable
 {
 public:
 			Nsocket_tcp() {}
+	virtual	~Nsocket_tcp() noexcept;
 
-public:
 	virtual	bool				closesocket(uint64_t _disconnect_reason = DISCONNECT_REASON_NONE) noexcept;
-	virtual	bool				disconnect(uint64_t _disconnect_reason = DISCONNECT_REASON_NONE) noexcept override;
-	virtual	bool				destroy() noexcept override { return closesocket(); }
+	virtual	bool				disconnect(uint64_t _disconnect_reason = DISCONNECT_REASON_NONE) noexcept;
 
 			std::size_t			get_minimum_mesage_buffer_size() const noexcept { return m_minimum_mesage_buffer_size;}
 			void				set_minimum_mesage_buffer_size(std::size_t _value) noexcept { m_minimum_mesage_buffer_size = _value; }
@@ -48,8 +45,8 @@ public:
 			std::size_t			get_max_depth_of_send_buffer() const noexcept { return m_max_depth_of_send_buffer; }
 			void				set_max_depth_of_send_buffer(std::size_t _value) noexcept { m_max_depth_of_send_buffer = _value; }
 
-			TSharedPtr<FInternetAddr> remote_endpoint() const noexcept { return process_get_peer_address(); };
-			TSharedPtr<FInternetAddr> local_endpoint() const noexcept { return process_get_socket_address(); };
+			TSharedPtr<FInternetAddr> remote_endpoint() const noexcept;
+			TSharedPtr<FInternetAddr> local_endpoint() const noexcept;
 
 protected:
 	virtual void				on_connect(net::io::Iconnective* _pconnective) {}
@@ -58,15 +55,18 @@ protected:
 	virtual	void				on_closesocket(uint64_t _disconnect_reason) {}
 
 protected:
-	virtual	TSharedPtr<FInternetAddr> process_get_socket_address() const noexcept override;
-	virtual	TSharedPtr<FInternetAddr> process_get_peer_address() const noexcept override;
+			struct SEND_DATA
+			{
+				shared_buffer	buf;
+				std::size_t		messages = 0;
+			};
 
-	virtual	bool				process_complete_connect(net::io::Iconnective* _pconnective, uintptr_t _return) override;
-	virtual	bool				process_complete_disconnect() override;
-	virtual	bool				process_sendable(net::io::Isend_completor* _psend_completor, const buffer_view* _array_buffer, std::size_t _count_buffer, Ireferenceable* _powner, std::size_t _count_message, const FInternetAddr& _address) override;
+	virtual	bool				process_complete_connect(net::io::Iconnective* _pconnective, uintptr_t _return);
+	virtual	bool				process_complete_disconnect();
+	virtual	bool				process_sendable(shared_buffer&& _buffer, std::size_t _messages);
 			intptr_t			process_receiving();
 			void				process_sending();
-	static	ESocketErrors		process_send_buffer(FSocket* _psocket, buffer_view& _buf_send);
+			bool				process_send_buffer(FSocket* _psocket, SEND_DATA&& _buf_send);
 	virtual	bool				process_closesocket(uint64_t _disconnect_reason = DISCONNECT_REASON_NONE) noexcept override;
 
 	virtual void				process_socket_io() override;
@@ -75,28 +75,26 @@ protected:
 			std::size_t			m_minimum_mesage_buffer_size = 1024; // default 1Kbytes
 			std::size_t			m_maximum_mesage_buffer_size = 64 * 1024 * 1024; // default 64Mbytes
 			std::size_t			m_max_depth_of_send_buffer = 1024;
-			struct QUEUE_SEND
-			{
-				object_ptr<net::io::Isend_completor> psend_completor;
-				buffer_view					array_buffer;
-				object_ptr<Ireferenceable>	powner;
-				std::size_t					count_message = 0;
-			};
-			lockable<>			m_lock_sending;
-			circular_list<QUEUE_SEND> m_queue_pending;
-			circular_list<QUEUE_SEND> m_queue_processing;
+			FCriticalSection	m_cs_sending;
+			std::vector<SEND_DATA> m_queue_pending;
+			SEND_DATA			m_buf_send_processing;
 			bool				m_flag_sending = false;
 
 			shared_buffer		m_buffer_received;
 };
 
+inline net::io::Nsocket_tcp::~Nsocket_tcp() noexcept
+{
+	net::io::Nsocket_tcp::process_closesocket();
+}
+
 inline bool net::io::Nsocket_tcp::closesocket(uint64_t _disconnect_reason) noexcept
 {
 	// 1) get native hnadle
-	auto psocket = native_handle();
+	auto psocket = this->native_handle();
 
 	// check) 
-	RETURN_IF(psocket == nullptr, false);
+	RETURN_IF(!psocket.IsValid(), false);
 
 	// 1) set linger option to abortive close
 	psocket->SetLinger(false, 0);
@@ -111,10 +109,10 @@ inline bool net::io::Nsocket_tcp::closesocket(uint64_t _disconnect_reason) noexc
 inline bool net::io::Nsocket_tcp::disconnect(uint64_t _disconnect_reason) noexcept
 {
 	// 1) get native hnadle
-	auto psocket = native_handle();
+	auto psocket = this->native_handle();
 
 	// check)
-	RETURN_IF(psocket == nullptr, false);
+	RETURN_IF(!psocket.IsValid(), false);
 
 	// 1) set linger option to graceful close
 	psocket->SetLinger(true, 0);
@@ -129,14 +127,13 @@ inline bool net::io::Nsocket_tcp::disconnect(uint64_t _disconnect_reason) noexce
 	return this->process_closesocket(_disconnect_reason);
 }
 
-
-inline TSharedPtr<FInternetAddr> net::io::Nsocket_tcp::process_get_socket_address() const noexcept
+inline TSharedPtr<FInternetAddr> net::io::Nsocket_tcp::local_endpoint() const noexcept
 {
 	// 1) get native hnadle
-	auto psocket = native_handle();
+	auto psocket = this->native_handle();
 
 	// check)
-	RETURN_IF(psocket == nullptr, TSharedPtr<FInternetAddr>(nullptr));
+	RETURN_IF(!psocket.IsValid(), TSharedPtr<FInternetAddr>(nullptr));
 
 	// 2) alloc 'FInternetAddr' object
 	auto addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
@@ -148,13 +145,13 @@ inline TSharedPtr<FInternetAddr> net::io::Nsocket_tcp::process_get_socket_addres
 	return addr;
 }
 
-inline TSharedPtr<FInternetAddr> net::io::Nsocket_tcp::process_get_peer_address() const noexcept
+inline TSharedPtr<FInternetAddr> net::io::Nsocket_tcp::remote_endpoint() const noexcept
 {
 	// 1) get native hnadle
-	auto psocket = native_handle();
+	auto psocket = this->native_handle();
 
 	// check)
-	RETURN_IF(psocket == nullptr, TSharedPtr<FInternetAddr>(nullptr));
+	RETURN_IF(!psocket.IsValid(), TSharedPtr<FInternetAddr>(nullptr));
 
 	// 2) alloc 'FInternetAddr' object
 	auto addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr();
@@ -172,10 +169,10 @@ inline bool net::io::Nsocket_tcp::process_complete_connect(net::io::Iconnective*
 	check(get_socket_state() == eSOCKET_STATE::SYN);
 
 	// 1) get socket handle
-	auto psocket = native_handle();
+	auto psocket = this->native_handle();
 
 	// check) return if psocket is nullptr
-	RETURN_IF(psocket == nullptr, false);
+	RETURN_IF(!psocket.IsValid(), false);
 
 	// declare)
 	bool result = true;
@@ -193,26 +190,28 @@ inline bool net::io::Nsocket_tcp::process_complete_connect(net::io::Iconnective*
 		case	ESocketConnectionState::SCS_Connected:
 				{
 					// - closesockcet
-					auto is_changed = set_socket_state_if(eSOCKET_STATE::SYN, eSOCKET_STATE::ESTABLISHED);
+					auto is_changed = this->set_socket_state_if(eSOCKET_STATE::SYN, eSOCKET_STATE::ESTABLISHED);
 
 					// - 
 					if (is_changed == true)
 					{
 						// - prepare receive
-						m_buffer_received.clear();
+						this->m_buffer_received.clear();
 
-						scoped_lock(m_lock_sending)
 						{
-							m_queue_pending.clear();
-							m_queue_processing.clear();
-							m_flag_sending = false;
+							FScopeLock cs(&this->m_cs_sending);
+
+							this->m_queue_pending.clear();
+							this->m_buf_send_processing = SEND_DATA();
+
+							this->m_flag_sending = false;
 						}
 
 						// statistics) 
-						statistics_on_connect();
+						this->statistics_on_connect();
 
 						// - on_connect
-						on_connect(_pconnective);
+						this->on_connect(_pconnective);
 					}
 				}
 				break;
@@ -253,25 +252,22 @@ inline bool net::io::Nsocket_tcp::process_complete_connect(net::io::Iconnective*
 inline bool net::io::Nsocket_tcp::process_closesocket(uint64_t _disconnect_reason) noexcept
 {
 	// 1) exchange
-	auto psocket = native_handle(nullptr);
+	auto psocket = this->reset_native_handle();
 
 	// check)
-	RETURN_IF(psocket == nullptr, false)
+	RETURN_IF(!psocket.IsValid(), false)
 
-	// 3) call 'on_closesocket()'
-	on_closesocket(m_disconnect_reason);
+	// 2) call 'on_closesocket()'
+	this->on_closesocket(this->m_disconnect_reason);
 
-	// 4) closesocket
+	// 3) closesocket
 	psocket->Close();
 
-	// 5) destroy socket
-	ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->DestroySocket(psocket);
-
-	// 6) detach from socket executor
+	// 4) detach from socket executor
 	executor::socket::get_instance()->detach(this);
 
 	// statistics) 
-	statistics_on_disconnect();
+	this->statistics_on_disconnect();
 
 	// return)
 	return true;
@@ -282,163 +278,115 @@ inline bool net::io::Nsocket_tcp::process_complete_disconnect()
 	// 1) closesockcet
 	auto is_changed = set_socket_state_if(eSOCKET_STATE::ESTABLISHED, eSOCKET_STATE::CLOSED);
 
-	// check)
-	check(is_changed == true);
-
 	// check) 
 	RETURN_IF(is_changed == false, false);
 
 	// 2) on_disconnect
-	on_disconnect(m_disconnect_reason);
+	this->on_disconnect(m_disconnect_reason);
 
 	// return) 
 	return true;
 }
 
-inline ESocketErrors net::io::Nsocket_tcp::process_send_buffer(FSocket* _psocket, buffer_view& _buf_send)
+inline bool net::io::Nsocket_tcp::process_send_buffer(FSocket* _psocket, SEND_DATA&& _send_data)
 {
-	auto buf_send = _buf_send;
-
-	do
+	// 1) send buffer
+	while (_send_data.buf.size() != 0)
 	{
 		// declare)
 		int32_t bytes_send = 0;
 
 		// - send
-		auto result = _psocket->Send(_buf_send.data<uint8>(), _buf_send.size<int32_t>(), bytes_send);
+		auto result= _psocket->Send(_send_data.buf.data<uint8>(), _send_data.buf.size<int32_t>(), bytes_send);
 
 		// - send completed
-		if (result)
+		if (!result)
 		{
-			// - process
-			buf_send += offset(bytes_send);
-		}
-		else
-		{
-			// check)
-			check(ISocketSubsystem::Get()->GetLastErrorCode() != ESocketErrors::SE_NO_ERROR);
+			// - get error code
+			auto err_code = ISocketSubsystem::Get()->GetLastErrorCode();
 
-			// - buffer update
-			_buf_send = buf_send;
-
-			// return)
-			return ISocketSubsystem::Get()->GetLastErrorCode();
-		}
-
-		if (buf_send.size() != 0)
-		{
-			_buf_send = buf_send;
-		}
-
-	} while (buf_send.size() != 0);
-
-	// return)
-	return ESocketErrors::SE_NO_ERROR;
-}
-
-inline bool net::io::Nsocket_tcp::process_sendable(net::io::Isend_completor* _psend_completor, const buffer_view* _array_buffer, std::size_t _count_buffer, Ireferenceable* _powner, std::size_t _count_message, const FInternetAddr& /*_address*/)
-{
-	// check)
-	check(_array_buffer != nullptr);
-	check(_count_buffer == 1);
-	check(_powner != nullptr);
-
-	// check) return if socket state is not CLOSED
-	RETURN_IF(get_socket_state() != eSOCKET_STATE::ESTABLISHED, false);
-
-	// 1) get socket handle
-	auto psocket = native_handle();
-
-	// check) 
-	check(psocket != nullptr);
-
-	// check) return if psocket is nullptr
-	RETURN_IF(psocket == nullptr, false);
-
-	// 2) queuing if aleady processing
-	scoped_lock(m_lock_sending)
-	{
-		if(m_flag_sending == true
-		|| m_queue_pending.empty() == false
-		|| m_queue_processing.empty() == false
-		)
-		{
-			// check) check overflow 
-			RETURN_IF(m_queue_pending.size() > m_max_depth_of_send_buffer, false);
-
-			// - generate 
-			QUEUE_SEND temp;
-			temp.psend_completor = _psend_completor;
-			temp.array_buffer = *_array_buffer;
-			temp.powner = _powner;
-			temp.count_message = _count_message;
+			// check) return if send_error
+			if (err_code != ESocketErrors::SE_EWOULDBLOCK
+			 && err_code != ESocketErrors::SE_TRY_AGAIN
+			 /*&& err_code == ESocketErrors::SE_EINPROGRESS*/)
+				return false;
 
 			// - queuing buffer
-			m_queue_pending.push_back(temp);
+			{
+				FScopeLock cs(&this->m_cs_sending);
+				this->m_buf_send_processing = std::move(_send_data);
+			}
+
+			// return) 
+			return true;
+		}
+
+		// - process
+		_send_data.buf += offset(bytes_send);
+	}
+
+	// 3) set flag_sending
+	this->m_flag_sending = false;
+
+	// return)
+	return true;
+}
+
+inline bool net::io::Nsocket_tcp::process_sendable(shared_buffer&& _buffer, std::size_t _messages)
+{
+	// check)
+	check(_buffer.exist());
+
+	// check) return if socket state is not CLOSED
+	RETURN_IF(this->get_socket_state() != eSOCKET_STATE::ESTABLISHED, false);
+
+	// 1) get socket handle
+	auto psocket = this->native_handle();
+
+	// check) return if psocket is nullptr
+	RETURN_IF(!psocket.IsValid(), false);
+
+	// - generate 
+	SEND_DATA temp;
+	temp.buf = std::move(_buffer);
+	temp.messages = _messages;
+
+	// 2) queuing if aleady processing
+	{
+		FScopeLock cs(&this->m_cs_sending);
+
+		if(this->m_flag_sending == true
+		|| this->m_queue_pending.empty() == false
+		|| this->m_buf_send_processing.buf.exist())
+		{
+			// check) check overflow 
+			RETURN_IF(this->m_queue_pending.size() > this->m_max_depth_of_send_buffer, false);
+
+			// - queuing buffer
+			this->m_queue_pending.push_back(std::move(temp));
 
 			// return) 
 			return true;
 		}
 
 		// - set flag_sending
-		m_flag_sending = true;
+		this->m_flag_sending = true;
 	}
-
-	// declare)
-	auto buf_send = *_array_buffer;
 
 	// 3) send buffer
-	auto result = process_send_buffer(psocket, buf_send);
-
-	// 4) queuing if it occured EWOULDBLOCK error
-	if (result == ESocketErrors::SE_EWOULDBLOCK)
-	{
-		// - queuing in front of buffer
-		QUEUE_SEND temp;
-		temp.psend_completor = _psend_completor;
-		temp.array_buffer = *_array_buffer;
-		temp.powner = _powner;
-		temp.count_message = _count_message;
-
-		// - queuing buffer
-		scoped_lock(m_lock_sending)
-		{
-			m_queue_pending.push_front(temp);
-		}
-
-		// - set flag_sending
-		m_flag_sending = false;
-
-		// return)
-		return true;
-	}
-
-	// 5) success or not
-	bool is_successed = (result == ESocketErrors::SE_NO_ERROR);
-
-	// 6) complete sending
-	if (_psend_completor != nullptr)
-	{
-		_psend_completor->process_complete_send(is_successed, _array_buffer->size(), _count_message); // (uintptr_t _return, std::size_t _transferred_bytes, std::size_t _transferred_message)
-	}
-
-	// 7) set flag_sending
-	m_flag_sending = false;
-
-	// return) 
-	return is_successed;
+	return this->process_send_buffer(psocket.Get(), std::move(temp));
 }
 
 inline void net::io::Nsocket_tcp::process_sending()
 {
 	// 1) get find...
-	auto psocket = native_handle();
+	auto psocket = this->native_handle();
 
 	// check) return if psocket is nullptr
-	if (psocket == nullptr)
+	if (!psocket.IsValid())
 	{
 		// - ...
-		m_flag_sending = false;
+		this->m_flag_sending = false;
 
 		// return) 
 		return;
@@ -453,63 +401,64 @@ inline void net::io::Nsocket_tcp::process_sending()
 		RETURN_IF(result == false, );
 	}
 
-	// check)
-	scoped_lock(m_lock_sending)
-	{
-		// check) 
-		RETURN_IF(m_flag_sending, );
+	// decalre) 
+	SEND_DATA send_data;
 
-		// 2) swap if empty
-		if (m_queue_processing.empty() == false)
+	{
+		// lock) 
+		FScopeLock cs(&this->m_cs_sending);
+
+		// check) 
+		RETURN_IF(this->m_flag_sending, );
+
+		// 3) swap if empty
+		if (this->m_buf_send_processing.buf.exist())
 		{
+			send_data = std::move(this->m_buf_send_processing);
 		}
-		else if(m_queue_pending.empty() == false)
-		{
-			m_queue_processing.swap(m_queue_pending);
-		}
-		else
+		else if (this->m_queue_pending.empty())
 		{
 			return;
 		}
+		else 
+		{
+			// - get queued pending bufs
+			auto queue_pending = std::move(this->m_queue_pending);
 
-		// 2) sending now
-		m_flag_sending = true;
+			// unlock) 
+			// 
+			// 
+			// - get 
+			size_t size = 0;
+			for (auto& iter : queue_pending)
+			{
+				size += iter.buf.size();
+				send_data.messages += iter.messages;
+			}
+
+			// check)
+			RETURN_IF(size == 0, );
+
+			// - alloc buffer
+			send_data.buf = alloc_shared_buffer(size);
+
+			// - copy buffer
+			for (auto& iter : queue_pending)
+				send_data.buf.append(iter.buf.size(), iter.buf.data<char>());
+		}
 	}
 
-
 	// 3) sending process
-	do
-	{
-		auto& iter = m_queue_processing.front();
-
-		// - send buffer
-		auto result = process_send_buffer(psocket, iter.array_buffer);
-
-		// check) 
-		BREAK_IF(result != ESocketErrors::SE_NO_ERROR)
-
-		// - complete sending
-		if (iter.psend_completor.exist())
-		{
-			iter.psend_completor->process_complete_send(0, 0, iter.count_message); // (uintptr_t _return, std::size_t _transferred_bytes, std::size_t _transferred_message)
-		}
-
-		// - pop_front
-		m_queue_processing.pop_front();
-
-	} while (m_queue_processing.empty() == false);
-
-	// 4) 
-	m_flag_sending = false;
+	this->process_send_buffer(psocket.Get(), std::move(send_data));
 }
 
 inline intptr_t net::io::Nsocket_tcp::process_receiving()
 {
 	// check) return if socket state is not eSOCKET_STATE::ESTABLISHED
-	check(get_socket_state() == eSOCKET_STATE::ESTABLISHED);
+	check(this->get_socket_state() == eSOCKET_STATE::ESTABLISHED);
 
 	// 1) get socket handle
-	auto psocket = native_handle();
+	auto psocket = this->native_handle();
 
 	// check) return if psocket is nullptr
 	RETURN_IF(psocket == nullptr, false);
@@ -527,22 +476,22 @@ inline intptr_t net::io::Nsocket_tcp::process_receiving()
 		int32_t bytes_transfered = 0;
 
 		// 3) if bytes_receive_peneded size is less than min_size, set as min_size
-		auto buffer_size = std::max<uint32_t>(m_minimum_mesage_buffer_size, bytes_pended); // g_bytes_message_buffer_default_min_size
+		auto buffer_size = std::max<uint32_t>(this->m_minimum_mesage_buffer_size, bytes_pended); // g_bytes_message_buffer_default_min_size
 
 		// 4) get receiving buffer
-		if (m_buffer_received.get_remained_size() >= m_buffer_received.size() + buffer_size)
+		if (this->m_buffer_received.get_remained_size() >= this->m_buffer_received.size() + buffer_size)
 		{
-			buffer_receive = std::move(m_buffer_received);
+			buffer_receive = std::move(this->m_buffer_received);
 		}
 		else
 		{
 			// - alloc new buffer
-			buffer_receive = alloc_shared_buffer(m_buffer_received.size() + buffer_size);
+			buffer_receive = alloc_shared_buffer(this->m_buffer_received.size() + buffer_size);
 
 			// - copy stored data
-			if (m_buffer_received.size() != 0)
+			if (this->m_buffer_received.size() != 0)
 			{
-				buffer_receive.append(m_buffer_received.size(), m_buffer_received.data());
+				buffer_receive.append(this->m_buffer_received.size(), this->m_buffer_received.data());
 			}
 		}
 
@@ -560,10 +509,10 @@ inline intptr_t net::io::Nsocket_tcp::process_receiving()
 			 && error_code != ESocketErrors::SE_EWOULDBLOCK)
 			{
 				// - call 'process_complete_disconnect()'
-				process_complete_disconnect();
+				this->process_complete_disconnect();
 
 				// - closesocket
-				process_closesocket();
+				this->process_closesocket();
 			}
 
 			// return)
@@ -571,31 +520,31 @@ inline intptr_t net::io::Nsocket_tcp::process_receiving()
 		}
 
 		// statistics)
-		statistics_on_receive_bytes(bytes_pended);
+		this->statistics_on_receive_bytes(bytes_pended);
 
 		// 7) add size 
 		buffer_receive.add_size(bytes_pended);
 
 		// 8) process message
-		process_packet(buffer_receive, TSharedPtr<FInternetAddr>(nullptr));
+		this->process_packet(buffer_receive, TSharedPtr<FInternetAddr>(nullptr));
 
 		// 9) store if remained
 		if (buffer_receive.size() != 0)
 		{
-			m_buffer_received = std::move(buffer_receive);
+			this->m_buffer_received = std::move(buffer_receive);
 		}
 		else
 		{
-			m_buffer_received.clear();
+			this->m_buffer_received.clear();
 		}
 	}
 	catch (...)
 	{
 		// - call 'process_complete_disconnect()'
-		process_complete_disconnect();
+		this->process_complete_disconnect();
 
 		// - close socket
-		process_closesocket(DISCONNECT_REASON_ACTIVE | DISCONNECT_REASON_ABORTIVE);
+		this->process_closesocket(DISCONNECT_REASON_ACTIVE | DISCONNECT_REASON_ABORTIVE);
 	}
 
 	// return)
@@ -604,15 +553,15 @@ inline intptr_t net::io::Nsocket_tcp::process_receiving()
 
 inline void net::io::Nsocket_tcp::process_socket_io()
 {
-	switch (get_socket_state())
+	switch (this->get_socket_state())
 	{
 	case	eSOCKET_STATE::SYN:
-			process_complete_connect(nullptr, 0);
+			this->process_complete_connect(nullptr, 0);
 			break;
 
 	case	eSOCKET_STATE::ESTABLISHED:
-			process_receiving();
-			process_sending();
+			this->process_receiving();
+			this->process_sending();
 			break;
 
 	default:

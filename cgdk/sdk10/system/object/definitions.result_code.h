@@ -72,15 +72,6 @@ private:
 [[nodiscard]] inline result_code	operator &  (const result_code& _lhs, const result_code& _rhs) noexcept { return result_code(_lhs.value() & _rhs.value()); }
 [[nodiscard]] inline result_code	operator ^  (const result_code& _lhs, const result_code& _rhs) noexcept { return result_code(_lhs.value() ^ _rhs.value()); }
 
-inline bool DOSS_SUCCESS(result_code _result)
-{
-	return _result < result_code(eRESULT::FAIL);
-}
-
-inline bool DOSS_FAILED(result_code _result)
-{
-	return !DOSS_SUCCESS(_result);
-}
 
 }
 

@@ -34,7 +34,7 @@ public:
 	virtual	~Ithrowable() noexcept {}
 public:
 	virtual	const std::string& description() const noexcept = 0;
-	//virtual	object_ptr<LOG_RECORD> get_log_record() const noexcept PURE;
+	//virtual	TSharedPtr<LOG_RECORD> get_log_record() const noexcept PURE;
 };
 
 // 2) Nthrowable
@@ -54,7 +54,7 @@ public:
 public:
 	virtual char const* what() const noexcept override { return ""; }
 	virtual	const std::string& description() const noexcept override { return m_description; }
-	//virtual	object_ptr<LOG_RECORD> get_log_record() const noexcept override;
+	//virtual	TSharedPtr<LOG_RECORD> get_log_record() const noexcept override;
 
 			eRESULT		reason() const noexcept { return m_reason; }
 	template <class TRESULT = uint64_t>
@@ -67,7 +67,7 @@ public:
 			auto&			operator >> (std::ostream& _stream_out) const { stream_out(_stream_out); return *this; }
 			void			stream_out(std::ostream& _stream_out) const { _stream_out << description() << std::endl; }
 public:
-							//operator object_ptr<LOG_RECORD>() const noexcept { return get_log_record();}
+							//operator TSharedPtr<LOG_RECORD>() const noexcept { return get_log_record();}
 
 public:
 	// 1) Exception Message

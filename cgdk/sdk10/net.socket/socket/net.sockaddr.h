@@ -87,6 +87,15 @@ class net::sockaddr
 {
 public:
 	constexpr sockaddr() noexcept : bytes_{ 0 } {}
+	sockaddr(const TSharedPtr<FInternetAddr>& _sockaddr)
+	{
+		uint32_t addr;
+		_sockaddr->GetIp(addr);
+		sockaddr_v4.sin_addr.S_un.S_addr = addr;
+		this->port(_sockaddr->GetPort());
+		sockaddr_v4.sin_family = 2; // AF_INET
+		length = sizeof(sockaddr_in);
+	}
 
 public:
 			constexpr bool		empty() const noexcept								{ return length == 0;}
@@ -106,6 +115,24 @@ public:
 			constexpr auto		port() const noexcept								{ return constexpr_htons(sockaddr_v6.sin6_port);}
 			void				port(unsigned short _port) noexcept					{ sockaddr_v6.sin6_port = constexpr_htons(_port);}
 			constexpr auto		size() const noexcept								{ return length;}
+			TSharedPtr<FInternetAddr> to_FInternetAddr() noexcept					
+			{
+				TSharedRef<FInternetAddr> addr = ISocketSubsystem::Get(PLATFORM_SOCKETSUBSYSTEM)->CreateInternetAddr(); 
+				addr->SetIp(sockaddr_v4.sin_addr.S_un.S_addr);
+				addr->SetPort(constexpr_htons(sockaddr_v6.sin6_port));
+				return addr;
+			}
+
+			sockaddr& operator = (const TSharedRef<FInternetAddr>& _sockaddr)
+			{
+				uint32_t addr;
+				_sockaddr->GetIp(addr);
+				sockaddr_v4.sin_addr.S_un.S_addr = addr;
+				this->port(_sockaddr->GetPort());
+				sockaddr_v4.sin_family = 2; // AF_INET
+				length = sizeof(sockaddr_in);
+				return *this;
+			}
 
 public:
 		union

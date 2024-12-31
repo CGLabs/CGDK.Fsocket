@@ -60,6 +60,11 @@ namespace CGDK
 	#define	POOL_STATISTICS(value)
 #endif	// _USE_STATISTICS_POOL
 
+inline void	__zero_memory(void* _dest, size_t _size) noexcept
+{
+	memset(_dest, 0, _size);
+}
+
 // 2) socket Info
 struct net::io::statistics::TRAFFIC
 {
@@ -154,7 +159,7 @@ public:
 //#define	TOTAL_INFO			1440*7
 #define	TOTAL_INFO				32
 																							  
-struct net::io::statistics::TRAFFIC_INFO : virtual public Ireferenceable					  
+struct net::io::statistics::TRAFFIC_INFO
 {																							  
 public:																						  
 			void				reset() noexcept
@@ -234,7 +239,7 @@ class net::io::statistics::Nsocket
 // constructor/destructor) 
 public:
 			Nsocket() :
-				m_pstatistics_traffic(make_object<TRAFFIC_INFO>()),
+				m_pstatistics_traffic(MakeShared<TRAFFIC_INFO>()),
 				m_count_total_connect_try(0),
 				m_count_total_connect(0),
 				m_count_connect_try(0),
@@ -281,7 +286,7 @@ public:
 // implementation) 
 private:
 	// 1) 전송량 통계
-			object_ptr<TRAFFIC_INFO> m_pstatistics_traffic;
+			TSharedPtr<TRAFFIC_INFO> m_pstatistics_traffic;
 
 	// 2) Total관련(이것은 socket이 disconnect되어도 reset되지 않는다.)
 			std::atomic<uint64_t>	m_count_total_connect_try;	// 총 접속 시도 횟수
@@ -300,7 +305,7 @@ private:
 			std::atomic<int>	m_count_async_sending;			// 현재 진행중인 send Overlapped I/O의 수.
 			std::atomic<int>	m_count_async_receiving;		// 현재 진행중인 receive Overlapped I/O의 수.
 
-	static	TRAFFIC_INFO&		_total() noexcept											{ static OBJ<TRAFFIC_INFO> m_statistics_traffic_total; return m_statistics_traffic_total; }
+	static	TRAFFIC_INFO&		_total() noexcept											{ static TRAFFIC_INFO m_statistics_traffic_total; return m_statistics_traffic_total; }
 
 public:
 			void				reset_statistics() noexcept

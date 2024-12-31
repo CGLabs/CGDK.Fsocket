@@ -25,11 +25,11 @@ namespace CGDK
 // net::io::Isender
 //
 //-----------------------------------------------------------------------------
-class net::io::Isender : virtual public Ireferenceable
+class net::io::Isender
 {
 public:
-			bool				send( const shared_buffer& _buffer, uint64_t _option = 0) { return process_send(_buffer, _option); }
-			bool				send( shared_buffer&& _buffer, uint64_t _option = 0) { return send(_buffer, _option); }
+			bool				send( const shared_buffer& _buffer, uint64_t _option = 0) { return this->send(shared_buffer(_buffer), _option); }
+			bool				send( shared_buffer&& _buffer, uint64_t _option = 0) { return this->process_send(std::move(_buffer), _option); }
 
 	template <std::size_t ICOUNT>
 			bool				send( const shared_buffer (&_array_buffer)[ICOUNT], uint64_t _option = 0);
@@ -44,7 +44,7 @@ public:
 			Isender&			operator<<(const T& _rhs) { send(_rhs); return *this;}
 
 protected:
-	virtual	bool				process_send( const shared_buffer& _buffer, uint64_t _option) PURE;
+	virtual	bool				process_send( shared_buffer&& _buffer, uint64_t _option) PURE;
 };
 
 template <std::size_t ICOUNT>
@@ -52,11 +52,11 @@ bool net::io::Isender::send( const shared_buffer(&_array_buffer)[ICOUNT], uint64
 {
 	for (std::size_t i = 0; i < ICOUNT; ++i)
 	{
-		send(_array_buffer[i], _option);
+		this->send(_array_buffer[i], _option);
 	}
 
 	// return) 
-	return	true;
+	return true;
 }
 
 template <class T>
@@ -72,16 +72,16 @@ net::io::Isender::send( const T& _list, uint64_t _option)
 	return	true;
 }
 
-class net::io::Isender_datagram : virtual public Ireferenceable
+class net::io::Isender_datagram
 {
 public:
-			bool				send_to( const shared_buffer& _buffer, const FInternetAddr& _address, uint64_t _option = 0) { return process_send(_buffer, _address, _option);}
-			bool				send_to( const shared_buffer& _buffer, FInternetAddr&& _address, uint64_t _option = 0) { return process_send(_buffer, _address, _option); }
+			bool				send_to( const shared_buffer& _buffer, const FInternetAddr& _address, uint64_t _option = 0) { return this->process_send(shared_buffer(_buffer), _address, _option);}
+			bool				send_to(shared_buffer&& _buffer, FInternetAddr&& _address, uint64_t _option = 0) { return this->process_send(std::move(_buffer), _address, _option); }
 
 	template <std::size_t ICOUNT>
 			bool				send_to( const shared_buffer (&_array_buffer)[ICOUNT], const FInternetAddr& _address, uint64_t _option = 0);
 	template <std::size_t ICOUNT>
-			bool				send_to( const shared_buffer (&_array_buffer)[ICOUNT], FInternetAddr&& _address, uint64_t _option = 0) { return send_to(_array_buffer, _address, _option); }
+			bool				send_to( const shared_buffer (&_array_buffer)[ICOUNT], FInternetAddr&& _address, uint64_t _option = 0) { return this->send_to(_array_buffer, _address, _option); }
 	template <class T, std::size_t ICOUNT>
 	typename std::enable_if<!std::is_base_of_v<shared_buffer, T>, bool>::type
 								send_to( const T(&_array)[ICOUNT], const FInternetAddr& _address, uint64_t _option = 0);
@@ -90,10 +90,10 @@ public:
 								send_to( const T& _list, const FInternetAddr& _address, uint64_t _option = 0);
 	template <class T>
 	typename std::enable_if<is_send_container<T>::value, bool>::type
-								send_to( const T& _list, FInternetAddr&& _address, uint64_t _option = 0) { return send_to(_list, _address, _option); }
+								send_to( const T& _list, FInternetAddr&& _address, uint64_t _option = 0) { return this->send_to(_list, _address, _option); }
 
 protected:
-	virtual	bool				process_send(const shared_buffer& _buffer, const FInternetAddr& _address, uint64_t _option) PURE;
+	virtual	bool				process_send( shared_buffer&& _buffer, const FInternetAddr& _address, uint64_t _option) PURE;
 };
 
 template <std::size_t ICOUNT>
@@ -119,7 +119,7 @@ bool net::io::Isender_datagram::send_to( const shared_buffer (&_array_buffer)[IC
 	}
 
 	// 4) send
-	return	process_send(buffer_temp, _address, _option);
+	return this->process_send(std::move(buffer_temp), _address, _option);
 }
 
 template <class T>
@@ -146,7 +146,7 @@ net::io::Isender_datagram::send_to( const T& _list_buffer, const FInternetAddr& 
 	}
 
 	// 4) send
-	return	process_send(buffer_temp, _address, _option);
+	return this->process_send(std::move(buffer_temp), _address, _option);
 }
 
 

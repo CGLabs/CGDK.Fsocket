@@ -119,5 +119,4 @@ constexpr void _do_post_make_shared_buffer(CGDK::_shared_buffer<buffer>& _source
 }
 
 
-
 }
