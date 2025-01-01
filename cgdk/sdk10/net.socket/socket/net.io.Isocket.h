@@ -31,9 +31,9 @@ namespace CGDK
 		virtual	~Isocket() noexcept {}
 
 	public:
-		virtual	bool				closesocket(uint64_t _disconnect_reason = DISCONNECT_REASON_NONE) noexcept PURE;
-		virtual	bool				process_closesocket(uint64_t _disconnect_reason = DISCONNECT_REASON_NONE) noexcept PURE;
-		virtual void				process_socket_io() PURE;
+		virtual	bool		closesocket(uint64_t _disconnect_reason = DISCONNECT_REASON_NONE) noexcept PURE;
+		virtual	bool		process_closesocket(uint64_t _disconnect_reason = DISCONNECT_REASON_NONE) noexcept PURE;
+		virtual void		process_socket_io() PURE;
 
 	public:
 		TSharedPtr<FSocket>	native_handle(TSharedPtr<FSocket>&& _psocket) noexcept { assert(_psocket.IsValid()); auto temp = std::move(this->m_psocket); this->m_psocket = std::move(_psocket); return temp; }

@@ -50,15 +50,9 @@ public:
 	//! @brief 큐잉된 '실행 객체'를 모두 실행한다.
 	virtual	void				execute_queued_all() noexcept;
 
-// implementation)
-protected:
-			FCriticalSection	m_cs_list_socket;
-			std::vector<TSharedPtr<net::io::Isocket>> m_list_socket;
-			std::vector<std::thread> m_list_thread;
-
 public:
-	static	TSharedPtr<socket>&	get_instance()
-	{ 
+	static	TSharedPtr<socket>& get_instance()
+	{
 		static TSharedPtr<socket> temp_instance;
 
 		return temp_instance;
@@ -71,16 +65,17 @@ public:
 		DESTORY
 	};
 
+protected:
+			FCriticalSection	m_cs_list_socket;
+			std::vector<TSharedPtr<net::io::Isocket>> m_list_socket;
+			std::vector<std::thread> m_list_thread;
+			eSTATUS				m_status{ eSTATUS::NONE };
+
 public:
 	static	void				initialize_instance(size_t _count_thread = 0);
 	static	bool				run_executor();
 	static	void				destory_executor() noexcept;
 
-	static	eSTATUS&			_status()
-	{
-		static eSTATUS status{ eSTATUS::NONE };
-		return status;
-	}
 	static	void				_fn_thread(socket* _this);
 			void				process_thread();
 	static	TSharedPtr<socket>	m_g_instance;
@@ -92,11 +87,11 @@ inline bool executor::socket::start(size_t _count_thread)
 	FScopeLock cs(&this->m_cs_list_socket);
 
 	// check)
-	if (this->_status() != eSTATUS::NONE)
+	if (this->m_status != eSTATUS::NONE)
 		return false;
 
 	// 1) set flat
-	this->_status() = eSTATUS::RUN;
+	this->m_status = eSTATUS::RUN;
 
 	// declare)
 	std::vector<std::thread> list_thread;
@@ -114,7 +109,7 @@ inline bool executor::socket::start(size_t _count_thread)
 	catch (...)
 	{
 		// rollback)
-		this->_status() = eSTATUS::NONE;
+		this->m_status = eSTATUS::NONE;
 
 		// - set result false
 		result = false;
@@ -130,32 +125,34 @@ inline void executor::socket::stop() noexcept
 	std::vector<std::thread> list_thread;
 	std::vector<TSharedPtr<net::io::Isocket>> list_socket;
 
-	// 1) reset thread
+	// 1) reset thread and get remained socket for close
 	{
 		// lock)
 		FScopeLock cs(&this->m_cs_list_socket);
 
 		// check) 
-		if (this->_status() != eSTATUS::RUN)
+		if (this->m_status != eSTATUS::RUN)
 			return;
 
 		// - stop the threads
 		if(this->m_list_socket.empty())
-			this->_status() = eSTATUS::NONE;
+			this->m_status = eSTATUS::NONE;
 		else
-			this->_status() = eSTATUS::DESTORY;
+			this->m_status = eSTATUS::DESTORY;
 
 		// - reset thread & copy sockets
 		list_thread = std::move(this->m_list_thread);
+
+		// - copy sockets
 		list_socket = this->m_list_socket;
 	}
 
 	// 2) close sockets
 	for (auto& iter : list_socket)
-		iter->process_closesocket();
+		iter->closesocket();
 
 	// 3) wait until socket 
-	while (this->_status() != eSTATUS::NONE)
+	while (this->m_status != eSTATUS::NONE)
 	{
 		this->run_executor();
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -172,12 +169,12 @@ inline bool executor::socket::attach(TSharedPtr<net::io::Isocket>&& _psocket)
 	FScopeLock cs(&this->m_cs_list_socket);
 
 	// check) 
-	if (this->_status() != eSTATUS::RUN)
+	if (this->m_status != eSTATUS::RUN)
 		return false;
 
 	// 1) find psocket
 	auto iter_find = std::find(this->m_list_socket.begin(), this->m_list_socket.end(), _psocket);
-
+	
 	// check) aleady exist?
 	RETURN_IF(iter_find != this->m_list_socket.end(), false);
 
@@ -193,18 +190,19 @@ inline bool executor::socket::detach(net::io::Isocket* _psocket) noexcept
 	// lock)
 	FScopeLock cs(&this->m_cs_list_socket);
 
-	// 1) find psocket
+	// 1) find socket
 	auto iter_find = std::find_if(this->m_list_socket.begin(), this->m_list_socket.end(), [=](const TSharedPtr<net::io::Isocket>& _iter) noexcept { return _iter.Get() == _psocket; });
 
-	// check) no exist?
-	RETURN_IF(iter_find == this->m_list_socket.end(), false);
+	// check)
+	if(iter_find == this->m_list_socket.end())
+		return false;
 
-	// 2) erase
+	// 2) erase socket
 	this->m_list_socket.erase(iter_find);
 
-	// 3) reset status
-	if (this->_status() == eSTATUS::DESTORY && this->m_list_socket.empty())
-		this->_status() = eSTATUS::NONE;
+	// 3) check all released on eSTATUS::DESTORY
+	if (this->m_status == eSTATUS::DESTORY && this->m_list_socket.empty())
+		this->m_status = eSTATUS::NONE;
 
 	// return) 
 	return true;
@@ -221,7 +219,7 @@ inline bool executor::socket::execute(FTimespan _wait, intptr_t _option)
 		FScopeLock cs(&this->m_cs_list_socket);
 
 		// check)
-		if (_status() == eSTATUS::NONE)
+		if (this->m_status == eSTATUS::NONE)
 			return false;
 		
 		// - copy soocket list
@@ -266,10 +264,6 @@ inline void executor::socket::destory_executor() noexcept
 		// lock) destroy
 		FScopeLock Lock(&cs_destory_instance);
 
-		// check)
-		if (_status() != eSTATUS::RUN)
-			return;
-
 		// 1) get executor_instance
 		pinstance = get_instance();
 
@@ -283,7 +277,7 @@ inline void executor::socket::destory_executor() noexcept
 
 inline void executor::socket::process_thread()
 {
-	while (this->_status() != eSTATUS::NONE)
+	while (this->m_status != eSTATUS::NONE)
 	{
 		execute(FTimespan(100));
 	}

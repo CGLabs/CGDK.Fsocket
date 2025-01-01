@@ -85,7 +85,10 @@ protected:
 
 inline net::io::Nsocket_tcp::~Nsocket_tcp() noexcept
 {
-	net::io::Nsocket_tcp::process_closesocket();
+	// check) assert if socket not closed (plz closesocket then destroy)
+	ensureMsgf(this->m_flag_sending == false, TEXT("[CGDK] Assert! socket is sending(socket is not closed)"));
+	ensureMsgf(this->m_socket_status == eSOCKET_STATE::CLOSED, TEXT("[CGDK] Assert! socket status is not 'eSOCKET_STATE::CLOSED'(socket is not closed)"));
+	ensureMsgf(!this->native_handle(), TEXT("[CGDK] Assert! hancle exist(socket is not closed)"));
 }
 
 inline bool net::io::Nsocket_tcp::closesocket(uint64_t _disconnect_reason) noexcept
