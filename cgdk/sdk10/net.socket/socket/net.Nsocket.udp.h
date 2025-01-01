@@ -32,6 +32,7 @@ class net::io::Nsocket_udp :
 {
 public:
 			Nsocket_udp() {}
+	virtual ~Nsocket_udp();
 
 public:
 			bool				bind();
@@ -62,6 +63,11 @@ protected:
 private:
 			bool				m_enable_report_connect_reset;
 };
+
+inline net::io::Nsocket_udp::~Nsocket_udp()
+{
+	assert(this->native_handle().IsValid() && m_socket_status == eSOCKET_STATE::CLOSED);
+}
 
 inline TSharedPtr<FInternetAddr> net::io::Nsocket_udp::get_socket_address() const noexcept
 {
@@ -211,7 +217,7 @@ inline bool net::io::Nsocket_udp::bind(FInternetAddr& _endpoint_bind)
 	}
 
 	// 5) on_bind함수를 호출한다.
-	on_bind();
+	this->on_bind();
 
 	// 6) register to socket executor
 	executor::socket::get_instance()->attach(this->AsShared());
@@ -222,7 +228,7 @@ inline bool net::io::Nsocket_udp::bind(FInternetAddr& _endpoint_bind)
 
 inline bool net::io::Nsocket_udp::closesocket(uint64_t _disconnect_reason) noexcept
 {
-	return process_closesocket(_disconnect_reason);
+	return this->process_closesocket(_disconnect_reason);
 }
 
 inline bool net::io::Nsocket_udp::process_sendable(shared_buffer&& _buffer, std::size_t _count_message, const FInternetAddr& _address)

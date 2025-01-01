@@ -181,7 +181,7 @@ inline bool net::io::Nsocket_tcp_client::process_closesocket(uint64_t _disconnec
 	// trace) 
 	UE_LOG(LogSockets, Display, TEXT("[CGDK] < socket closed (reason:%d) (%u)"), this->m_disconnect_reason, this->native_handle().Get());
 
-	// 4) detach from socket executor
+	// 3) detach from socket executor
 	if (this->m_enable_reconnect == false)
 	{
 		executor::socket::get_instance()->detach(this);
@@ -223,7 +223,7 @@ inline void net::io::Nsocket_tcp_client::process_reconnectiong()
 
 inline void net::io::Nsocket_tcp_client::process_socket_io()
 {
-	switch (get_socket_state())
+	switch (this->get_socket_state())
 	{
 	case	eSOCKET_STATE::SYN:
 			this->process_complete_connect(nullptr, 0);
