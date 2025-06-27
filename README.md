@@ -7,7 +7,7 @@ network classes for unreal 3D Fsocket with CGDK::buffer<br>
 
 ### 특징<br>
    CGDK10.Fsocket은 unreal 3d에서 제공하는 Fsocket을 사용하여<br>
-   CGDK10으로 제작된 서버와 손쉬운 통신과 CGDK10과 동일한 방식으로 코딩이 가능하도록 하기 위해 랩핑(Wrapping)한 클래스들입니다.<br>
+   CGDK10으로 제작된 서버와 손쉬운 통신과 CGDK10과 동일한 방식의 코딩이 가능하도록 하기 위해 랩핑(Wrapping)한 클래스들입니다.<br>
    헤더 파일로만 제작되어 library의 링크 없이 헤더 파일을 include만으로 가볍게 사용가능 합니다.<br>
    이로 인해 플랫폼 종속성이 없어 unreal 3d가 동작하는 모든 플랫폼에서 사용 가능합니다.<br>
    메시지 송수신용 버퍼로 CGDK::buffer를 사용하고 있어 CGGDK::buffer 모듈을 포함하고 있습니다.
@@ -39,13 +39,13 @@ network classes for unreal 3D Fsocket with CGDK::buffer<br>
 <br>
 
    __5.__ 성공적으로 컴파일 되는지 확인하십시요.<br>
-      성공적으로 컴파일 된다면 이제 CGDK10.Fsocket의 socket들을 사용하실수 있습니다.<br>
+      성공적으로 컴파일 된다면 이제 CGDK10.Fsocket의 socket들을 사용하실 수 있습니다.<br>
 <br>
 
 ### 주의사항
 
-__1.__ 사용법은 CGDK10과 유사한 인터페이스를 가지고 있어 유사합니다.
-unreal 3d 프로젝트를 올리기 힘든 관계롸 자세한 예제를 올리기 힘든 면이 있습니다.<br>
+__1.__ 사용법은 CGDK10과 유사한 인터페이스를 가지고 있어 사용법도 거의 동일 합니다.
+unreal 3d 프로젝트 예제도 올리고 싶으나 용량 등 여러 문제로 올리기 힘든 면이 있습니다.<br>
 자세한 설명이 필요하시면 discussions란에 글을 남기시거나 e-mail로 질문 주시면 최대한 빠르게 답변 드리겠습니다.<br>
 <br>
 __2.__ socket 관련 i/o를 처리하기 위해 unreal 3d의 WorldSubSystem(UTickableWorldSubsystem)을 사용하기 때문에<br>
